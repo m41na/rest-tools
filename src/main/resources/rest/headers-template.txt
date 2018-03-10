@@ -1,0 +1,4 @@
+#%RAML 0.8
+---
+title: Simple-Tools REST API
+version: 1

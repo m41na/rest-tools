@@ -1,0 +1,12 @@
+.classpath
+.project
+.vertx
+.settings
+**/.settings
+target/
+**/target
+*.class
+*.jar
+*.log
+*.war
+nbactions.xml

@@ -1,0 +1,117 @@
+#%RAML 0.8
+---
+title: Simple-Tools REST API
+version: 1
+/ping - getPingMessage:
+  get:
+    description: 
+    protocols: [HTTP, HTTPS]
+    headers:
+      Tools-Authorization-Token:
+        displayName: Tools-Authorization-Token
+        example: mn5bFqIw7p41VPmdqvFkyw==&&2tmYlEYolAvl9eRhCCmfQ0lfJG559yhn
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              response currently not available
+              {"onSuccess" : "{"result" : "success"}"}
+              {"onError" : ""}
+/ping/admin - getPingAdminMessage:
+  get:
+    description: 
+    protocols: [HTTP, HTTPS]
+    headers:
+      Tools-Authorization-Token:
+        displayName: Tools-Authorization-Token
+        example: g5QHQMnVMOS4DYtbweMaGQ==&&PyD8J/KzxjKD8SYHtDMVNF/RACcjqBp3
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              response currently not available
+              {"onSuccess" : "{"result" : "success"}"}
+              {"onError" : ""}
+/ping/download/{file} - downloadPdfFile:
+  get:
+    description: 
+    protocols: [HTTP, HTTPS]
+    headers:
+      Tools-Authorization-Token:
+        displayName: Tools-Authorization-Token
+        example: NF5enAv4Fmxl/aqpp7dDLA==&&QnRT2xZpwu6Rit8+JuZRhI1MswpB7MPK
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              response currently not available
+              {"onSuccess" : "{"result" : "success"}"}
+              {"onError" : ""}
+/ping/exception - getPingException:
+  get:
+    description: 
+    protocols: [HTTP, HTTPS]
+    headers:
+      Tools-Authorization-Token:
+        displayName: Tools-Authorization-Token
+        example: XbC1ICiQnNI7buwQE3WyKg==&&wFgRBNhkg4+/IMRkZvNfF6+66V35caAO
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              response currently not available
+              {"onSuccess" : "{"result" : "success"}"}
+              {"onError" : ""}
+/ping/guest - getPingGuestMessage:
+  get:
+    description: 
+    protocols: [HTTP, HTTPS]
+    headers:
+      Tools-Authorization-Token:
+        displayName: Tools-Authorization-Token
+        example: PzpI/swjnb8b1lK8ek9jAw==&&ph5GfSl0Fh0+Zqo9xVLi6XpQ1mFSMHo/
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              response currently not available
+              {"onSuccess" : "{"result" : "success"}"}
+              {"onError" : ""}
+/ping/todo - getPingJsonTasks:
+  get:
+    description: 
+    protocols: [HTTP, HTTPS]
+    headers:
+      Tools-Authorization-Token:
+        displayName: Tools-Authorization-Token
+        example: dmWOz89Uw0xGnJzDV58HzA==&&HPwgodoV52FA7c53PdPhZzO68iDGE2i1
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              response currently not available
+              {"onSuccess" : "{"result" : "success"}"}
+              {"onError" : ""}
+/ping/upload - uploadFile:
+  post:
+    description: 
+    protocols: [HTTP, HTTPS]
+    headers:
+      Tools-Authorization-Token:
+        displayName: Tools-Authorization-Token
+        example: G7PyF87sbtClGlqUUez6ew==&&1N7lbXrTK+zTmcGC9XMjf1ZtfS/rwVEE
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              response currently not available
+              {"onSuccess" : "{"result" : "success"}"}
+              {"onError" : ""}
+

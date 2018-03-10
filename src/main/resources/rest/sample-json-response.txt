@@ -1,0 +1,18 @@
+{
+  "id" : "PING_3",
+  "method" : "get",
+  "description" : "Internal users only. Used to check if service is up and running, and test using header parameters with GET",
+  "path" : "/ping/users/valid",
+  "consumes" : [ ],
+  "produces" : [ "application/json" ],
+  "accessLevels" : [ "ALL_INT" ],
+  "headers" : {
+    "iv-user" : [ "rjjj967c_csr" ],
+    "last" : [ "maina" ],
+    "dob" : [ "10/10/2010" ],
+    "email" : [ "email@outlook.com" ]
+  },
+  "requestBody" : "{}",
+  "statusCode" : 200,
+  "responseBody" : "{  \"last\" : \"maina\",  \"email\" : \"email@outlook.com\",  \"dob\" : null}"
+}

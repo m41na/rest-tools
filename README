@@ -1,0 +1,111 @@
+This is a utility project with which you can auto-magically generate API documentation for any endpoints, on-demand, and includes the headers, request body and response body, when ran against a live server. I wanted to highlight its features and typical usage scenarios.
+
+1.	How to run
+
+- Fire up the rest web-service. This has to be up and running, otherwise the RAML generator will just choke.
+
+- Simply open the ApiDocGenerator file in your workspace, and run as a Java Application (run the �main� method). I plan to make it an executable jar which you just double click and the rest is history
+
+2.	Controlling how it runs
+
+This is achieved using a configuration file, called �raml-gen-config.properties�. You can tweak these values in your workspace to your heart�s desire. The existing properties are:
+
+a)	url=http://localhost:8081/rws/
+
+As you can very well guess, this points to the target server on which this application will run against
+
+b)	basePackage=works.hop.rest.resource
+
+This tells the application which base package to start looking up for Resource classes. Currently you can only have one value for base resource. Probably I�ll enhance this at some point to take multiple values
+
+c)	inspectAll=false
+
+This tells the application whether to inspect all the Resources discovered under the base package. By setting the value to �false�, then the application will look at �targetedResources� and �targetedEndpoints� to determine what to inspect. Setting the value to �true� will ignore anything you have set for �targetedResources��and �targetedEndpoints��
+
+d)	targetedResources=works.hop.rest.resource.UsersResource
+
+This will tell the application which class to inspect/analyse. The application will of course expect this Resource to have been discovered in the base package. You can put multiple class name. To do so, use semi-colon (;) or comma (,) to separate the values
+
+e)	targetedEndpoints=USERS_/2-10/
+
+This will tell the application which endpoints in the targeted/discovered resources to inspect, and generate API documentation against. You can put multiple values for the ids. To do so, use semi-colon (;) or comma (,) to separate the values.
+
+One other power feature with this is that to some extent, you can use a pattern to limit the amount of typing if you have to do when specifying multiple serviceIds to target.
+
+i)	Range � you can use the pattern �/x-y/� to indicate a range. An example would be �USERS_/2-9/�. This would translate to �All endpoint ids from USERS_2 through USERS_9, all inclusive)
+ii)	Series � you can use a pattern like �/x|y|z|/� to indicate a series. An example would be �USERS_/2|5|6/�. This would translate to �USERS_2;USERS_5;USERS_6�
+
+iii)	You can mix-n-match all the options above, like �USERS_/2-5/;PING_/1|3/;USERS_10�. This will unfold into �USERS_2;USERS3;USERS_4;USERS_5;PING_1;PING_3;USERS_10�. I�m sure you can see the value of pattern matching
+
+f)	writeToRemoteFile=false
+
+This, when set to true, will tell the application to write to the remote file. Ideally I should make the destination file configurable, but for now, the entire RAML content is also dumped on the console for you to copy and use in whichever way you desire.
+
+g)	remoteFilePath=e:/temp/api
+
+This value points the application to the location of the remote file it should write to
+
+h)	mergeWithExisting=false
+
+This feature is not implemented yet, but the idea is to be able to read the remote file and re-create the RAML model in memory, merge the newly-generated RAML in memory with this existing model, and then write the new ouput back to the file again. So setting this value to anything at the moment has no effect
+
+i)	ignoreMethods=false
+
+This hold a set of http methods names, separated by comma, will tell the application to skip generating API for endpoints whose http methods are in this set. These values could be 
+
+j) endpointDefinitions=
+
+This is not yet documented.
+
+3.	Targeting Endpoints
+
+To get this tool to generate RAML documentation for any endpoint, you need to give it hint. To do this, you will need to annotate this endpoint with the @Api annotation. The only required field is �id�. The id should be unique for any endpoint, otherwise, the generator will detonate on you. All other values are optional, and the generator makes the best effort to obtain the correct value.
+
+But to actually make a valid request, you need to provide valid data. This could be in the form of a body entity of request headers. The generator allows you to provide both and gladly make that request from which it gets the response body.
+
+I will walk through the other parameters which you can use
+
+a)	descr
+
+This is used to provide a succinct description of the endpoint. If no value is provided, the generator will use the �content� value available in the WADLDoc annotation
+
+b)	method
+
+This will be used to specify which HTTP method the endpoint is handling. It infers this from the �http-method� annotation on the endpoint. The default value is �GET�
+
+c)	path
+
+This will specify what relative path will get you to the endpoint. The generator will make a best effort to deduce this for you base on �Path� annotations present on on the parent class and/or on the method
+
+d)	consume
+
+This will specify the content type which the endpoint will be looking out for. The value is deduced from the @Consumes annotation. If none is available, the default value is empty
+
+e)	produces
+
+This will specify the content type which the endpoint will be serving to the clients. The value is deduced from the @Provides annotation. If none is available, the default value is �application/json�
+
+f)	headers
+
+This will provide header values that will be required to fulfill this request. These headers should be valid values because that�s how you will get a valid response back. To specify headers, use �pair-values� separated by commas, for instance �headers={�iv-user=abcdef�, �wps-target-user-id=jammie�, wps-npi=12345�}
+
+g)	entity
+
+This will provide the request body required to fulfill this request. The entity should be encoded in the appropriate format to match the content-type value. For convenience, where the request body is colossal, there is a file in the resource folder called �raml-input-data.json�. This is a flat json object which takes the service id for your endpoint, and the associated request body. The generator will automatically discover this if the http-method is either POST, PUT or DELETE.
+
+h)	response
+
+This will provide the body of the response coming from the server, for this particular endpoint. 
+
+i)	statusCode
+
+This will represent the status code for the response coming back
+
+j)	serviceURL
+
+This, if provided, will override the value of the URL provided in the config file. You probably wouldn�t care much about this, but it�s there for completeness.
+
+See PingResource for typical usage.
+
+k) name
+This will be associated with the endpoint method invoked in the REST resource class

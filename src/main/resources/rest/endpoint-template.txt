@@ -1,0 +1,24 @@
+${path} - ${name!}:
+  ${method}:
+    description: ${description!}
+    protocols: [HTTP, HTTPS]
+    headers:
+     <#list headers?keys as header>
+      ${header}:
+        displayName: ${header}
+        example: <#if headers[header]?size != 0>${headers[header][0]}</#if>
+      </#list>
+    <#if requestBody?has_content>
+    body:
+      application/json:
+        schema: |
+          ${requestBody}
+    </#if>
+    responses:
+      ${statusCode}:
+        body:
+          application/json:
+            example: |
+              ${responseBody}
+              {"onSuccess" : "${onSuccess!}"}
+              {"onError" : "${onError!}"}
