@@ -39,17 +39,7 @@ public class EndpointRequest {
         return this;
     }
 
-    public EndpointRequest headers(Map<String, String[]> values) {
-        values.keySet().forEach((header) -> {
-            String[] value = values.get(header);
-            if (value.length > 0 && value[0].trim().length() > 0) {
-                resource.header(header, value);
-            }
-        });
-        return this;
-    }
-
-    public EndpointRequest headers2(Map<String, String> values) {
+    public EndpointRequest headers(Map<String, String> values) {
         values.keySet().forEach((header) -> {
             resource.header(header, values.get(header));
         });

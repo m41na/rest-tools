@@ -1,11 +1,8 @@
 package works.hop.rest.tools.client;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +11,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Objects;
 import works.hop.rest.tools.api.ApiAssert;
-import works.hop.rest.tools.api.ApiAssert.AssertType;
 
 import works.hop.rest.tools.api.ApiReq;
 import works.hop.rest.tools.api.ApiRes;
@@ -26,7 +22,7 @@ import works.hop.rest.tools.handler.ApacheOptionsHandler;
 import works.hop.rest.tools.handler.ApachePostHandler;
 import works.hop.rest.tools.handler.ApachePutHandler;
 
-public class RestConnector implements Runnable {
+public class RestConnector implements Runnable, RestKeys {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestConnector.class);
     private JsonLoader jsonLoader;
@@ -68,164 +64,22 @@ public class RestConnector implements Runnable {
     public JsonNode loadJson() {
         return getJsonLoader().loadJson();
     }
-
-    public static ApiReq extractEndpoint(JsonNode node) {
-        ApiReq rep = new ApiReq();
-        JsonNode id = node.get("id");
-        if (id != null) {
-            rep.setId(id.asText());
-        }
-
-        JsonNode name = node.get("name");
-        if (name != null) {
-            rep.setName(name.asText());
-        }
-
-        JsonNode descr = node.get("descr");
-        if (descr != null) {
-            rep.setDescription(descr.asText());
-        }
-
-        JsonNode method = node.get("method");
-        if (method != null) {
-            rep.setMethod(method.asText());
-        }
-
-        JsonNode path = node.get("path");
-        if (path != null) {
-            rep.setPath(path.asText());
-        }
-
-        JsonNode query = node.get("query");
-        if (query != null) {
-            rep.setQuery(query.asText());
-        }
-
-        JsonNode cNode = node.get("consumes");
-        if (cNode != null) {
-            rep.setConsumes(cNode.asText());
-        }
-
-        JsonNode pNode = node.get("produces");
-        if (pNode != null) {
-            rep.setProduces(pNode.asText());
-        }
-
-        JsonNode hNode = node.get("headers");
-        if (hNode != null) {
-            Map<String, String[]> headers = new HashMap<>();
-            for (int i = 0; i < hNode.size(); i++) {
-                String keyValue;
-                keyValue = hNode.get(i).asText();
-                //some header values may have '=' in them, so use first index of '=' to separate key/value
-                int index = keyValue.indexOf(":");
-                if (index < 0) {
-                    index = keyValue.indexOf("=");
-                }
-                //String[] splitKeyValue = keyValue.split("[=:]");
-                String[] splitKeyValue = new String[]{keyValue.substring(0, index), keyValue.substring(index + 1)};
-                String key = splitKeyValue[0];
-                if (headers.keySet().contains(key)) {
-                    String[] existingValue = headers.get(key);
-                    String[] newValue = new String[existingValue.length + 1];
-                    System.arraycopy(existingValue, 0, newValue, 0, existingValue.length);
-                    newValue[newValue.length - 1] = splitKeyValue[1];
-                    headers.put(key, newValue);
-                } else {
-                    String[] newValue = (splitKeyValue.length > 1) ? new String[]{splitKeyValue[1]}
-                            : new String[]{};
-                    headers.put(key, newValue);
-                }
-            }
-            rep.setHeaders(headers);
-        }
-
-        JsonNode eNode = node.get("envs");
-        if (eNode != null) {
-            Map<String, String> entries = new HashMap<>();
-            for (int i = 0; i < eNode.size(); i++) {
-                String keyValue;
-                keyValue = eNode.get(i).asText();
-                String[] splitKeyValue = keyValue.split("=");
-                String key = splitKeyValue[0];
-                if (entries.keySet().contains(key)) {
-                    String existingValue = entries.get(key);
-                    String newValue = splitKeyValue[1];
-                    LOG.warn("overwriting value of '{}' from '{}' to '{}'", key, existingValue, newValue);
-                    entries.put(key, newValue);
-                } else {
-                    String newValue = splitKeyValue[1];
-                    entries.put(key, newValue);
-                }
-            }
-            ApiReq.setEnvs(entries);
-        }
-
-        JsonNode entity = node.get("entity");
-        if (entity != null) {
-            rep.setRequestBody(entity.toString());
-        }
-
-        JsonNode assertsNode = node.get("assertions");
-        if (assertsNode != null) {
-            List<ApiAssert<?>> assertions = new LinkedList<>();
-            for(int i = 0; i < assertsNode.size(); i++){
-                JsonNode listNode = assertsNode.get(i);
-                ApiAssert assertion = new ApiAssert();
-                assertion.actualValue = listNode.get("actualValue").asText();
-                assertion.expectedValue = listNode.get("expectedValue").asText();
-                assertion.assertType = AssertType.valueOf(listNode.get("assertType").asText());
-                assertion.failMessage = listNode.get("failMessage").asText();
-                assertions.add(assertion);
-            }
-            rep.setAssertions(assertions);
-        }
-
-        JsonNode url = node.get("url");
-        if (url != null) {
-            rep.setBaseUrl(url.asText());
-        }
-
-        JsonNode execute = node.get("execute");
-        if (execute != null) {
-            rep.setExecute(execute.asBoolean(Boolean.FALSE));
-        }
-        return rep;
-    }
-
-    public static ApiReq extractEndpoint(JsonNode node, int index) {
-        JsonNode target = node.get(index);
-        return extractEndpoint(target);
-    }
-
-    public static List<ApiReq> extractEndpoints(JsonNode node) {
-        return extractEndpoints(node, 0);
-    }
-
-    public static List<ApiReq> extractEndpoints(JsonNode node, int startIndex) {
-        List<ApiReq> endpoints = new LinkedList<>();
-        for (int i = startIndex; i < node.size(); i++) {
-            ApiReq rep = extractEndpoint(node.get(i));
-            endpoints.add(rep);
-        }
-        return endpoints;
-    }
-
+    
     public static List<ApiReq> mergeEndpoints(ApiReq base, List<ApiReq> endpoints) {
         endpoints.stream().map((rep) -> {
             // override url if a key is provided instead of a valid url
-            String urlValue = rep.getBaseUrl();
+            String urlValue = rep.getUrl();
             if (isNotEmpty(urlValue)) {
                 if (!urlValue.matches("^http.*")) {
-                    String resolvedUrl = ApiReq.getEnvs().get(urlValue);
+                    String resolvedUrl = rep.getEnvs().get(urlValue);
                     if (resolvedUrl != null && resolvedUrl.matches("^http.*")) {
-                        rep.setBaseUrl(resolvedUrl);
+                        rep.setUrl(resolvedUrl);
                     } else {
-                        rep.setBaseUrl(base.getBaseUrl());
+                        rep.setUrl(base.getUrl());
                     }
                 }
             } else {
-                rep.setBaseUrl(base.getBaseUrl());
+                rep.setUrl(base.getUrl());
             }
             return rep;
         }).map((rep) -> {
@@ -239,8 +93,8 @@ public class RestConnector implements Runnable {
             }
             return rep;
         }).map((rep) -> {
-            if (isEmpty(rep.getRequestBody())) {
-                rep.setRequestBody(base.getRequestBody());
+            if (isEmpty(rep.getEntity())) {
+                rep.setEntity(base.getEntity());
             }
             return rep;
         }).map((rep) -> {
@@ -264,13 +118,14 @@ public class RestConnector implements Runnable {
         return endpoints;
     }
 
-    public static List<ApiReq> extractAndMergeEndpoints(JsonNode endpointNodes) {
+    public static List<ApiReq> mergeEndpoints(List<ApiReq> nodes) {
+        LOG.info("merging endpoints with template (should always be the first one)");
         // 1. Extract base/template node
-        ApiReq defaultNode = extractEndpoint(endpointNodes, 0);
+        ApiReq templateNode = nodes.get(0);
         // 2. Extract other nodes
-        List<ApiReq> otherNodes = extractEndpoints(endpointNodes, 1);
+        List<ApiReq> otherNodes = nodes.subList(1, nodes.size());
         // 3. Merge missing values with those in base
-        return mergeEndpoints(defaultNode, otherNodes);
+        return RestConnector.mergeEndpoints(templateNode , otherNodes);
     }
 
     public static ApiReq searchEndpoint(List<ApiReq> endpoints, String path, String method) {
@@ -297,16 +152,18 @@ public class RestConnector implements Runnable {
     }
 
     public List<ApiReq> prepareEndpoints() {
-        // 1. Read json endpoints
-        JsonNode endpointNodes = loadJson();
-        if (endpointNodes.isArray()) {
-            // 2 extract and merge all endpoints
-            return extractAndMergeEndpoints(endpointNodes);
+        LOG.info("preparing json endpoints");
+        List<ApiReq> nodes = loadEndpoints();
+        if(nodes.size() > 1){
+            return mergeEndpoints(nodes);
         } else {
-            // 2 Extract and return as a list of 1
-            ApiReq singleNode = extractEndpoint(endpointNodes);
-            return Arrays.asList(singleNode);
+            return nodes;
         }
+    }
+    
+    public List<ApiReq> loadEndpoints() {
+        LOG.info("loading json");
+        return getJsonLoader().readValue(new TypeReference<List<ApiReq>> (){});
     }
 
     @Override
@@ -319,30 +176,30 @@ public class RestConnector implements Runnable {
             for (ApiReq endpoint : mergedNodes) {
                 String method = endpoint.getMethod();
                 if (Objects.equals(endpoint.getExecute(), Boolean.TRUE)) {
-                    if (method.equalsIgnoreCase("GET")) {
+                    if (method.equalsIgnoreCase(GET)) {
                         ApiRes response = new ApacheGetHandler().handle(endpoint);
                         notifyResponse(response, endpoint.getAssertions());
                         System.out.println(endpoint);
-                    } else if (method.equalsIgnoreCase("POST")) {
+                    } else if (method.equalsIgnoreCase(POST)) {
                         ApiRes response = new ApachePostHandler().handle(endpoint);
                         notifyResponse(response, endpoint.getAssertions());
                         System.out.println(endpoint);
-                    } else if (method.equalsIgnoreCase("PUT")) {
+                    } else if (method.equalsIgnoreCase(PUT)) {
                         ApiRes response = new ApachePutHandler().handle(endpoint);
                         notifyResponse(response, endpoint.getAssertions());
                         System.out.println(endpoint);
                     }
-                    else if(method.equalsIgnoreCase("DELETE")){
+                    else if(method.equalsIgnoreCase(DELETE)){
                         ApiRes response = new ApacheDeleteHandler().handle(endpoint);
                         notifyResponse(response, endpoint.getAssertions());
                         System.out.println(endpoint);
                     }
-                    else if(method.equalsIgnoreCase("HEAD")){
+                    else if(method.equalsIgnoreCase(HEAD)){
                         ApiRes response = new ApacheHeadHandler().handle(endpoint);
                         notifyResponse(response, endpoint.getAssertions());
                         System.out.println(endpoint);
                     }
-                    else if(method.equalsIgnoreCase("OPTIONS")){
+                    else if(method.equalsIgnoreCase(OPTIONS)){
                         ApiRes response = new ApacheOptionsHandler().handle(endpoint);
                         notifyResponse(response, endpoint.getAssertions());
                         System.out.println(endpoint);
@@ -359,7 +216,7 @@ public class RestConnector implements Runnable {
 
     public static void main(String... args) {
         String ENDPOINTS_FILE = "/rest/target-endpoints.json";
-        RestConnector client = new RestConnector(new CpathJsonLoader(ENDPOINTS_FILE));
+        RestConnector client = new RestConnector(new ClassPathJsonLoader(ENDPOINTS_FILE));
         client.run();
     }
 }

@@ -15,7 +15,7 @@ public class ApacheGetHandler extends AbstractApacheHandler<ApiRes> {
         CloseableHttpClient httpClient = buildClient();
         String queryStr = endpoint.getQueryParams().length > 0 ? "?" + endpoint.getQueryParams()[0]
                 : endpoint.getQuery() != null ? "?" + endpoint.getQuery() : "";
-        String url = endpoint.getBaseUrl() + endpoint.getPath() + queryStr;
+        String url = endpoint.getUrl() + endpoint.getPath() + queryStr;
         HttpGet httpGet = new HttpGet(url);
         httpGet.setHeaders(createHeaders(endpoint));
         LOG.info("Executing request " + httpGet.getRequestLine());

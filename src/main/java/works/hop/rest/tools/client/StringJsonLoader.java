@@ -1,5 +1,6 @@
 package works.hop.rest.tools.client;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,5 +28,19 @@ public class StringJsonLoader implements JsonLoader {
             LOG.error(e.getMessage());
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public <T> T readValue(Class<T> type) {
+        JsonNode node = loadJson();
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.convertValue(node, type);
+    }
+
+    @Override
+    public <T> T readValue(TypeReference<T> type) {
+        JsonNode node = loadJson();
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.convertValue(node, type);
     }
 }

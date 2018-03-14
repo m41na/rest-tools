@@ -15,7 +15,7 @@ public class ApachePostHandler extends AbstractApacheHandler<ApiRes> {
         CloseableHttpClient httpClient = buildClient();
         String queryStr = endpoint.getQueryParams().length > 0 ? "?" + endpoint.getQueryParams()[0]
                 : endpoint.getQuery() != null ? "?" + endpoint.getQuery() : "";
-        String url = endpoint.getBaseUrl() + endpoint.getPath() + queryStr;
+        String url = endpoint.getUrl() + endpoint.getPath() + queryStr;
         HttpPost httpPost = new HttpPost(url);
         httpPost.setHeaders(createHeaders(endpoint));
         httpPost.setEntity(extractEntity(endpoint));

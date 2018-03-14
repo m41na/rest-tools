@@ -8,29 +8,29 @@ import java.util.Map;
 
 import works.hop.rest.tools.util.SimpleJson;
 
-public class ApiReq implements Httpfied, Serializable {
+public class ApiReq implements Serializable {
 
     private static final long serialVersionUID = 5742436875626069669L;
     private String id;
     private String name;
     private String method;
-    private String description;
+    private String descr;
+    private String url;
     private String path;
     private String[] pathParams = {}; //new
     private String query;
     private String[] queryParams = {};//new
     private String consumes;
     private String produces;
+    private Map<String, String> headers = new HashMap<>();
+    private String entity;
     private String[] authorized = {}; //new
-    private Map<String, String[]> headers = new HashMap<>();
-    private String requestBody;
     private ApiRes response = new ApiRes();
     private List<ApiAssert<?>>  assertions = new LinkedList<>();
     //added these to work with Httpfied interface
-    private String baseUrl;
     private Boolean execute;
     //added to hold available urls to environments which instances can use
-    protected static Map<String, String> envs = new HashMap<>();
+    private Map<String, String> envs = new HashMap<>();
 
     public String getId() {
         return id;
@@ -56,12 +56,12 @@ public class ApiReq implements Httpfied, Serializable {
         this.method = method;
     }
 
-    public String getDescription() {
-        return description;
+    public String getDescr() {
+        return descr;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setDescr(String descr) {
+        this.descr = descr;
     }
 
     public String getPath() {
@@ -120,24 +120,24 @@ public class ApiReq implements Httpfied, Serializable {
         this.authorized = authorized;
     }
 
-    public Map<String, String[]> getHeaders() {
+    public Map<String, String> getHeaders() {
         return headers;
     }
 
-    public void setHeaders(Map<String, String[]> headers) {
+    public void setHeaders(Map<String, String> headers) {
         this.headers = headers;
     }
 
-    public void addHeader(String header, String... value) {
+    public void addHeader(String header, String value) {
         headers.put(header, value);
     }
 
-    public String getRequestBody() {
-        return requestBody;
+    public String getEntity() {
+        return entity;
     }
 
-    public void setRequestBody(String requestBody) {
-        this.requestBody = requestBody;
+    public void setEntity(String entity) {
+        this.entity = entity;
     }
 
     public ApiRes getResponse() {
@@ -156,16 +156,14 @@ public class ApiReq implements Httpfied, Serializable {
         this.assertions = assertions;
     }
 
-    @Override
-    public String getBaseUrl() {
-        return baseUrl;
+    public String getUrl() {
+        return url;
     }
 
-    public void setBaseUrl(String baseUrl) {
-        this.baseUrl = baseUrl;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
-    @Override
     public Boolean getExecute() {
         return execute;
     }
@@ -188,8 +186,8 @@ public class ApiReq implements Httpfied, Serializable {
         if (consumes != null) {
             guest.setConsumes(consumes);
         }
-        if (description != null) {
-            guest.setDescription(description);
+        if (descr != null) {
+            guest.setDescr(descr);
         }
         if (headers != null) {
             guest.setHeaders(headers);
@@ -197,19 +195,19 @@ public class ApiReq implements Httpfied, Serializable {
         if (produces != null) {
             guest.setProduces(produces);
         }
-        if (requestBody != null && requestBody.trim().length() > 0) {
-            guest.setRequestBody(requestBody);
+        if (entity != null && entity.trim().length() > 0) {
+            guest.setEntity(entity);
         }
         //return happy guest
         return guest;
     }
 
-    public static Map<String, String> getEnvs() {
+    public Map<String, String> getEnvs() {
         return envs;
     }
 
-    public static void setEnvs(Map<String, String> envs) {
-        ApiReq.envs = envs;
+    public void setEnvs(Map<String, String> envs) {
+        this.envs = envs;
     }
 
     @Override

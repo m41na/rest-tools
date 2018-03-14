@@ -15,7 +15,7 @@ public class ApacheDeleteHandler extends AbstractApacheHandler<ApiRes> {
         CloseableHttpClient httpClient = buildClient();
         String queryStr = endpoint.getQueryParams().length > 0 ? "?" + endpoint.getQueryParams()[0]
                 : endpoint.getQuery() != null ? "?" + endpoint.getQuery() : "";
-        String url = endpoint.getBaseUrl() + endpoint.getPath() + queryStr;
+        String url = endpoint.getUrl() + endpoint.getPath() + queryStr;
         HttpDelete httpDel = new HttpDelete(url);
         httpDel.setHeaders(createHeaders(endpoint));
         LOG.info("Executing request " + httpDel.getRequestLine());

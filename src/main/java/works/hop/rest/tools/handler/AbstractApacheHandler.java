@@ -62,9 +62,9 @@ import java.security.NoSuchAlgorithmException;
 import works.hop.rest.tools.api.ApiReq;
 import works.hop.rest.tools.api.ApiRes;
 import works.hop.rest.tools.api.RequestHandler;
-import works.hop.rest.tools.client.RestReader;
-import works.hop.rest.tools.client.RestReader.ByteArrayCallback;
-import works.hop.rest.tools.client.RestReader.StringCallback;
+import works.hop.rest.tools.client.FileDataReader;
+import works.hop.rest.tools.client.FileDataReader.ByteArrayCallback;
+import works.hop.rest.tools.client.FileDataReader.StringCallback;
 
 public abstract class AbstractApacheHandler<T> implements RequestHandler<T> {
 
@@ -74,13 +74,12 @@ public abstract class AbstractApacheHandler<T> implements RequestHandler<T> {
         List<Header> headersList = new ArrayList<>();
 
         // extract header values
-        Map<String, String[]> headers = rep.getHeaders();
+        Map<String, String> headers = rep.getHeaders();
         if (headers != null && headers.size() > 0) {
             headers.keySet().forEach((key) -> {
-                String[] values = headers.get(key);
-                for (String value : values) {
-                    headersList.add(new BasicHeader(key, value));
-                }
+                String value = headers.get(key);
+                //should multiple values in one header have individual BasicHeader objects created?
+                headersList.add(new BasicHeader(key, value));
             });
         }
 
@@ -133,7 +132,7 @@ public abstract class AbstractApacheHandler<T> implements RequestHandler<T> {
 
     protected HttpEntity extractEntity(ApiReq rep) throws UnsupportedEncodingException {
         if (rep.getConsumes().contains("application/json")) {
-            String entity = stripStartEndCommas(rep.getRequestBody().replace("'", "\""));
+            String entity = stripStartEndCommas(rep.getEntity().replace("'", "\""));
             return new StringEntity(entity, ContentType.APPLICATION_JSON);
         }
         if (rep.getConsumes().contains("multipart/form-data")) {
@@ -143,7 +142,7 @@ public abstract class AbstractApacheHandler<T> implements RequestHandler<T> {
             builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
 
             // break up entity string and add to builder
-            String formParamsString = stripStartEndCommas(rep.getRequestBody());
+            String formParamsString = stripStartEndCommas(rep.getEntity());
             List<NameValuePair> formParams = extractFormParameters(formParamsString);
             formParams.forEach((param) -> {
                 if (param.getName().equals("file")) {
@@ -160,7 +159,7 @@ public abstract class AbstractApacheHandler<T> implements RequestHandler<T> {
             return entity;
         }
         if (rep.getConsumes().contains("multipart/form-data --> this is an alternative approach")) {
-            String fileName = stripStartEndCommas(rep.getRequestBody());
+            String fileName = stripStartEndCommas(rep.getEntity());
             File file = new File(fileName);
 
             MultipartEntityBuilder builder = MultipartEntityBuilder.create();
@@ -171,7 +170,7 @@ public abstract class AbstractApacheHandler<T> implements RequestHandler<T> {
         }
         if (rep.getConsumes().contains("application/x-www-form-urlencoded")) {
             List<NameValuePair> nvps = new ArrayList<>();
-            String entity = stripStartEndCommas(rep.getRequestBody());
+            String entity = stripStartEndCommas(rep.getEntity());
             String[] pairs = entity.split("&");
             for (String pair : pairs) {
                 String[] keyValue = pair.split("=");
@@ -217,15 +216,15 @@ public abstract class AbstractApacheHandler<T> implements RequestHandler<T> {
     }
     
     protected byte[] readResponseStream(InputStream response) throws IOException {
-        return RestReader.readBytes(response);
+        return FileDataReader.readBytes(response);
     }
 
     protected String readResponseStreamAsString(InputStream response) throws IOException {
-        return RestReader.readBytes(response, new StringCallback());
+        return FileDataReader.readBytes(response, new StringCallback());
     }
 
     protected ByteArrayOutputStream readResponseStreamAsByteArray(InputStream response) throws IOException {
-        return RestReader.readBytes(response, new ByteArrayCallback());
+        return FileDataReader.readBytes(response, new ByteArrayCallback());
     }
 
     /**

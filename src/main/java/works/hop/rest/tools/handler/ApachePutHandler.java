@@ -15,7 +15,7 @@ public class ApachePutHandler extends AbstractApacheHandler<ApiRes> {
         CloseableHttpClient httpClient = buildClient();
         String queryStr = endpoint.getQueryParams().length > 0 ? "?" + endpoint.getQueryParams()[0]
                 : endpoint.getQuery() != null ? "?" + endpoint.getQuery() : "";
-        String url = endpoint.getBaseUrl() + endpoint.getPath() + queryStr;
+        String url = endpoint.getUrl() + endpoint.getPath() + queryStr;
         HttpPut httpPut = new HttpPut(url);
         httpPut.setHeaders(createHeaders(endpoint));
         httpPut.setEntity(extractEntity(endpoint));

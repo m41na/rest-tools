@@ -178,16 +178,25 @@ public abstract class ApiDocGenerator {
                     endpoint.setName(method.getName());
                     endpoint.getResponse().setResponseBody(doc.response().getBytes());
                     endpoint.getResponse().setStatusCode(doc.status());
-                    endpoint.setRequestBody(doc.entity());
+                    endpoint.setEntity(doc.entity());
                     endpoint.setConsumes(String.join(";", doc.consumes()));
                     endpoint.setProduces(String.join(";", doc.produces()));
                     endpoint.setQuery(doc.query());
 
                     // populate headers with test data if available
                     for (String header : doc.headers()) {
-                        String[] keyValue = header.split("=");
-                        String[] value = (keyValue.length == 2) ? keyValue[1].split(",") : new String[]{""};
-                        endpoint.addHeader(keyValue[0], value);
+                        int index = header.indexOf(':');
+                        if(index == -1){
+                            index = header.indexOf('=');
+                        }
+                        if(index > -1){
+                            String key = header.substring(0, index);
+                            String value = header.substring(index + 1);
+                            endpoint.addHeader(key, value);
+                        }
+                        else{
+                            endpoint.addHeader(header, "");
+                        }
                     }
                 }
             }
@@ -218,7 +227,7 @@ public abstract class ApiDocGenerator {
             // if 'consumes' indicates json, and the request method is not GET,
             // then resolve 'entity' from JsonData
             if (matches(Pattern.compile(".*json$"), endpoint.getConsumes()) && !endpoint.getMethod().equalsIgnoreCase("GET")) {
-                String entity = endpoint.getRequestBody();
+                String entity = endpoint.getEntity();
                 if (entity != null && entity.trim().length() > 0) {
                     // check if entity is not valid json, and if so, resolve
                     // from data file
@@ -226,7 +235,7 @@ public abstract class ApiDocGenerator {
                         entity = ApiDocJsonData.instance(config.getRamlInputData()).resolve(endpoint.getName());
                     }
                 }
-                endpoint.setRequestBody(entity);
+                endpoint.setEntity(entity);
             }
 
             // check that endpoint name is unique
@@ -248,7 +257,7 @@ public abstract class ApiDocGenerator {
                         LOG.info(String.format("fetching response for [%s] %s", endpoint.getMethod(), serviceURL));
                         WebTarget resource = getRestClient().target(serviceURL);
                         Response response = new EndpointRequest(resource.request()).accept(endpoint.getProduces().split(";")).contentType(endpoint.getConsumes().split(";"))
-                                .headers(endpoint.getHeaders()).requestEntity(endpoint.getRequestBody()).execute(endpoint.getMethod());
+                                .headers(endpoint.getHeaders()).requestEntity(endpoint.getEntity()).execute(endpoint.getMethod());
 
                         String responseBody = response.readEntity(String.class);
                         endpoint.getResponse().setResponseBody(responseBody.replaceAll("\\r|\\n", "").getBytes());
@@ -304,9 +313,9 @@ public abstract class ApiDocGenerator {
             String serviceURL = config.sanitizedURL(aliveURL);
             WebTarget target = getRestClient().target(serviceURL);
             Builder bld = target.request();
-            Map<String, String[]> headers = createApiReq().getHeaders();
+            Map<String, String> headers = createApiReq().getHeaders();
             headers.keySet().forEach((header) -> {
-                bld.header(header, headers.get(header)[0]);
+                bld.header(header, headers.get(header));
             });
             Response response = bld.accept("text/plain").get();
             return response.getStatus() == 200;

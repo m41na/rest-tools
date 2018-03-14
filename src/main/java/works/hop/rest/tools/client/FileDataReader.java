@@ -11,7 +11,7 @@ import java.util.Arrays;
  * improved to use NIO?
  *
  */
-public class RestReader {
+public class FileDataReader {
 
     public static interface Callback<T> {
 

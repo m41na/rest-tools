@@ -1,5 +1,6 @@
 package works.hop.rest.tools.util;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.Collections;
 import java.util.List;
 
@@ -8,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import works.hop.rest.tools.api.ApiReqComparator;
 
 import works.hop.rest.tools.api.ApiReq;
-import works.hop.rest.tools.client.CpathJsonLoader;
+import works.hop.rest.tools.client.ClassPathJsonLoader;
 import works.hop.rest.tools.client.JsonLoader;
 import works.hop.rest.tools.client.RestConnector;
 
@@ -18,8 +19,9 @@ public class RegenData {
 
     public static void main(String[] args) {
         String ENDPOINTS_FILE = "/rest/sample-endpoints.json";
-        JsonLoader loader = new CpathJsonLoader(ENDPOINTS_FILE);
-        List<ApiReq> endpoints = RestConnector.extractAndMergeEndpoints(loader.loadJson());
+        JsonLoader loader = new ClassPathJsonLoader(ENDPOINTS_FILE);
+        List<ApiReq> nodes = loader.readValue(new TypeReference<List<ApiReq>>(){});
+        List<ApiReq> endpoints = RestConnector.mergeEndpoints(nodes);
         Collections.sort(endpoints, new ApiReqComparator());
         
         //renumber nodes
