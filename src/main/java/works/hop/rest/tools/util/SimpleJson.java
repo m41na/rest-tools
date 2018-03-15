@@ -1,6 +1,7 @@
 package works.hop.rest.tools.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 
@@ -24,6 +25,15 @@ public class SimpleJson {
     }
 
     public static <T> T fromJson(String json, Class<T> type) {
+        try {
+            ObjectMapper mapper = provideObjectMapper();
+            return mapper.readValue(json, type);
+        } catch (IOException cause) {
+            throw new RuntimeException(cause);
+        }
+    }
+    
+    public static <T> T fromJson(String json, TypeReference<T> type) {
         try {
             ObjectMapper mapper = provideObjectMapper();
             return mapper.readValue(json, type);
