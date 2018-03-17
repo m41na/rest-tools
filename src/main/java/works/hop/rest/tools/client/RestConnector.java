@@ -64,7 +64,7 @@ public class RestConnector implements Runnable, RestKeys {
     public JsonNode loadJson() {
         return getJsonLoader().loadJson();
     }
-    
+
     public static List<ApiReq> mergeEndpoints(ApiReq base, List<ApiReq> endpoints) {
         endpoints.stream().map((rep) -> {
             // override url if a key is provided instead of a valid url
@@ -125,7 +125,7 @@ public class RestConnector implements Runnable, RestKeys {
         // 2. Extract other nodes
         List<ApiReq> otherNodes = nodes.subList(1, nodes.size());
         // 3. Merge missing values with those in base
-        return RestConnector.mergeEndpoints(templateNode , otherNodes);
+        return RestConnector.mergeEndpoints(templateNode, otherNodes);
     }
 
     public static ApiReq searchEndpoint(List<ApiReq> endpoints, String path, String method) {
@@ -154,64 +154,65 @@ public class RestConnector implements Runnable, RestKeys {
     public List<ApiReq> prepareEndpoints() {
         LOG.info("preparing json endpoints");
         List<ApiReq> nodes = loadEndpoints();
-        if(nodes.size() > 1){
+        if (nodes.size() > 1) {
             return mergeEndpoints(nodes);
         } else {
             return nodes;
         }
     }
-    
+
     public List<ApiReq> loadEndpoints() {
         LOG.info("loading json");
-        return getJsonLoader().readValue(new TypeReference<List<ApiReq>> (){});
+        return getJsonLoader().readValue(new TypeReference<List<ApiReq>>() {
+        });
     }
 
-    @Override
-    public void run() {
+    public void executeEndpoint(ApiReq endpoint) {
         try {
-            // 1. Fetch endpoints
-            List<ApiReq> mergedNodes = prepareEndpoints();
-
-            // 2. fire request to each endpoint
-            for (ApiReq endpoint : mergedNodes) {
-                String method = endpoint.getMethod();
-                if (Objects.equals(endpoint.getExecute(), Boolean.TRUE)) {
-                    if (method.equalsIgnoreCase(GET)) {
-                        ApiRes response = new ApacheGetHandler().handle(endpoint);
-                        notifyResponse(response, endpoint.getAssertions());
-                        System.out.println(endpoint);
-                    } else if (method.equalsIgnoreCase(POST)) {
-                        ApiRes response = new ApachePostHandler().handle(endpoint);
-                        notifyResponse(response, endpoint.getAssertions());
-                        System.out.println(endpoint);
-                    } else if (method.equalsIgnoreCase(PUT)) {
-                        ApiRes response = new ApachePutHandler().handle(endpoint);
-                        notifyResponse(response, endpoint.getAssertions());
-                        System.out.println(endpoint);
-                    }
-                    else if(method.equalsIgnoreCase(DELETE)){
-                        ApiRes response = new ApacheDeleteHandler().handle(endpoint);
-                        notifyResponse(response, endpoint.getAssertions());
-                        System.out.println(endpoint);
-                    }
-                    else if(method.equalsIgnoreCase(HEAD)){
-                        ApiRes response = new ApacheHeadHandler().handle(endpoint);
-                        notifyResponse(response, endpoint.getAssertions());
-                        System.out.println(endpoint);
-                    }
-                    else if(method.equalsIgnoreCase(OPTIONS)){
-                        ApiRes response = new ApacheOptionsHandler().handle(endpoint);
-                        notifyResponse(response, endpoint.getAssertions());
-                        System.out.println(endpoint);
-                    } else {
-                        String message = String.format("Handler for '%s' method has not yet been implemented", method);
-                        throw new UnsupportedOperationException(message);
-                    }
+            String method = endpoint.getMethod();
+            if (Objects.equals(endpoint.getExecute(), Boolean.TRUE)) {
+                if (method.equalsIgnoreCase(GET)) {
+                    ApiRes response = new ApacheGetHandler().handle(endpoint);
+                    notifyResponse(response, endpoint.getAssertions());
+                    System.out.println(endpoint);
+                } else if (method.equalsIgnoreCase(POST)) {
+                    ApiRes response = new ApachePostHandler().handle(endpoint);
+                    notifyResponse(response, endpoint.getAssertions());
+                    System.out.println(endpoint);
+                } else if (method.equalsIgnoreCase(PUT)) {
+                    ApiRes response = new ApachePutHandler().handle(endpoint);
+                    notifyResponse(response, endpoint.getAssertions());
+                    System.out.println(endpoint);
+                } else if (method.equalsIgnoreCase(DELETE)) {
+                    ApiRes response = new ApacheDeleteHandler().handle(endpoint);
+                    notifyResponse(response, endpoint.getAssertions());
+                    System.out.println(endpoint);
+                } else if (method.equalsIgnoreCase(HEAD)) {
+                    ApiRes response = new ApacheHeadHandler().handle(endpoint);
+                    notifyResponse(response, endpoint.getAssertions());
+                    System.out.println(endpoint);
+                } else if (method.equalsIgnoreCase(OPTIONS)) {
+                    ApiRes response = new ApacheOptionsHandler().handle(endpoint);
+                    notifyResponse(response, endpoint.getAssertions());
+                    System.out.println(endpoint);
+                } else {
+                    String message = String.format("Handler for '%s' method has not yet been implemented", method);
+                    throw new UnsupportedOperationException(message);
                 }
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void run() {
+        // 1. Fetch endpoints
+        List<ApiReq> mergedNodes = prepareEndpoints();
+        // 2. fire request to each endpoint
+        mergedNodes.stream().forEach((endpoint) -> {
+            executeEndpoint(endpoint);
+        });
     }
 
     public static void main(String... args) {

@@ -45,7 +45,7 @@ public class FilePathJsonLoader implements JsonLoader {
             try (InputStream is = new FileInputStream(file)) {
                 LOG.info("creating sample endpoints data");
                 ObjectMapper mapper = new ObjectMapper();
-                T result = mapper.readValue(sourceFile, type);
+                T result = mapper.readValue(is, type);
                 return result;
             } catch (IOException e) {
                 e.printStackTrace(System.err);
@@ -63,7 +63,7 @@ public class FilePathJsonLoader implements JsonLoader {
             try (InputStream is = new FileInputStream(file)) {
                 LOG.info("creating sample endpoints data");
                 ObjectMapper mapper = new ObjectMapper();
-                T result = mapper.readValue(sourceFile, type);
+                T result = mapper.readValue(is, type);
                 return result;
             } catch (IOException e) {
                 e.printStackTrace(System.err);
