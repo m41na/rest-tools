@@ -55,27 +55,27 @@ public class AssertionResListener implements ApiResListener {
     }
 
     private String executeAssertion(ApiAssert assertion) {
-        switch (assertion.assertType) {
+        switch (assertion.getAssertType()) {
             case assertContains:
                 Map<String, Object> context = SimpleJson.fromJson(response.getResponseBody().toString(), Map.class);
-                String actual = MVEL.evalToString(assertion.actualValue, context);
-                return actual.contains((String) assertion.expectedValue) ? "pass" : assertion.failMessage;
+                String actual = MVEL.evalToString(assertion.getActualValue(), context);
+                return actual.contains((String) assertion.getExpectedValue()) ? "pass" : assertion.getFailMessage();
             case assertEquals:
                 context = SimpleJson.fromJson(response.getResponseBody().toString(), Map.class);
-                actual = MVEL.evalToString(assertion.actualValue, context);
-                return actual.contains((String) assertion.expectedValue) ? "pass" : assertion.failMessage;
+                actual = MVEL.evalToString(assertion.getActualValue(), context);
+                return actual.contains((String) assertion.getExpectedValue()) ? "pass" : assertion.getFailMessage();
             case assertNotEmpty:
                 context = SimpleJson.fromJson(response.getResponseBody().toString(), Map.class);
-                actual = MVEL.evalToString(assertion.actualValue, context);
-                return actual.length() > 0 ? "pass" : assertion.failMessage;
+                actual = MVEL.evalToString(assertion.getActualValue(), context);
+                return actual.length() > 0 ? "pass" : assertion.getFailMessage();
             case assertElementExists:
                 Document doc = Jsoup.parse(response.getResponseBody().toString());
-                Element element = doc.selectFirst(assertion.actualValue);
-                return element != null ? "pass" : assertion.failMessage;
+                Element element = doc.selectFirst(assertion.getActualValue());
+                return element != null ? "pass" : assertion.getFailMessage();
             case assertElementTextContains:
                 doc = Jsoup.parse(response.getResponseBody().toString());
-                element = doc.selectFirst(assertion.actualValue);
-                return element.text().contains((String) assertion.expectedValue) ? "pass" : assertion.failMessage;
+                element = doc.selectFirst(assertion.getActualValue());
+                return element.text().contains((String) assertion.getExpectedValue()) ? "pass" : assertion.getFailMessage();
             default:
                 System.out.println("Could not determine result");
                 break;

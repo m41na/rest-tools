@@ -27,9 +27,7 @@ public class ApiReq implements Serializable {
     private String[] authorized = {}; //new
     private ApiRes response = new ApiRes();
     private List<ApiAssert<?>>  assertions = new LinkedList<>();
-    //added these to work with Httpfied interface
     private Boolean execute;
-    //added to hold available urls to environments which instances can use
     private Map<String, String> envs = new HashMap<>();
 
     public String getId() {
