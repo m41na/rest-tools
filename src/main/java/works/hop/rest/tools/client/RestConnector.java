@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Arrays;
 import java.util.Objects;
 import works.hop.rest.tools.api.ApiAssert;
 
@@ -63,6 +64,10 @@ public class RestConnector implements Runnable, RestKeys {
 
     public JsonNode loadJson() {
         return getJsonLoader().loadJson();
+    }
+    
+    public static ApiReq mergeEndpoint(ApiReq base, ApiReq endpoint){
+        return mergeEndpoints(base, Arrays.asList(endpoint)).get(0);
     }
 
     public static List<ApiReq> mergeEndpoints(ApiReq base, List<ApiReq> endpoints) {
