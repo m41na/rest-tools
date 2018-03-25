@@ -10,7 +10,7 @@ public class ApiAssert<T extends Comparable<T>> {
     private String failMessage;
     private T expectedValue;
     private String actualValue;   
-    private Boolean execute;
+    private Boolean execute = true;
 
     public Long getId() {
         return id;

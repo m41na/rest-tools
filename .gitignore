@@ -10,3 +10,4 @@ target/
 *.log
 *.war
 nbactions.xml
+/nbproject/
