@@ -11,6 +11,7 @@ public class ApiAssert<T extends Comparable<T>> {
     private T expectedValue;
     private String actualValue;   
     private Boolean execute = true;
+    private String result;
 
     public Long getId() {
         return id;
@@ -58,5 +59,13 @@ public class ApiAssert<T extends Comparable<T>> {
 
     public void setExecute(Boolean execute) {
         this.execute = execute;
+    }
+
+    public String getResult() {
+        return result;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
     }
 }

@@ -10,7 +10,5 @@ public interface ApiResListener {
     
     List<ApiAssert<?>> getApiAssertions();
     
-    List<String> getAssertionResults();
-    
     void onReadyResponse(ApiRes response, List<ApiAssert<?>> assertions);
 }

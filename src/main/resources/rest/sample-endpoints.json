@@ -5,24 +5,25 @@
         "descr": "provide your own template",
         "method": "GET",
         "path": "/",
-        "consumes": [],
-        "produces": ["application/json"],
-        "headers": [],
+        "consumes": "",
+        "produces": "application/json",
+        "headers": {},
         "entity": "",
         "response": "please provide a response",
         "status": 200,
         "url": "http://localhost:9080/rest/app",
-        "envs": ["local=http://localhost:9083/rest/app",
-            "dev=http://some-dev-host:port/rest/app",
-            "test=http://some-test-host:port/rest/app"],
+        "envs": {
+            "local":"http://localhost:9083/rest/app",
+            "dev":"http://some-dev-host:port/rest/app",
+            "test":"http://some-test-host:port/rest/app"
+         },
         "execute": false
     },
     {
         "id": 1,
         "name": "SAMPLE_GET",
         "path": "/some/path",
-        "headers": ["user-id=admin",
-            "access-token=1346233178"],
+        "headers": {"user-id": "admin", "access-token":"1346233178"},
         "execute": true
     }
 ]
