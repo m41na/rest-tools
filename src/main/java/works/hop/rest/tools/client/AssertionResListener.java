@@ -8,7 +8,7 @@ import org.jsoup.nodes.Element;
 import org.mvel2.MVEL;
 import works.hop.rest.tools.api.ApiAssert;
 import works.hop.rest.tools.api.ApiRes;
-import works.hop.rest.tools.util.SimpleJson;
+import works.hop.rest.tools.util.RestToolsJson;
 
 public class AssertionResListener implements ApiResListener {
 
@@ -42,21 +42,21 @@ public class AssertionResListener implements ApiResListener {
     private String executeAssertion(ApiAssert assertion) {
         switch (assertion.getAssertType()) {
             case assertContains: {
-                Map<String, Object> context = SimpleJson.fromJson(response.getResponseBody().toString(), Map.class);
+                Map<String, Object> context = RestToolsJson.fromJson(response.getResponseBody().toString(), Map.class);
                 String actual = MVEL.evalToString(assertion.getActualValue(), context);
                 String result = actual.contains((String) assertion.getExpectedValue()) ? "pass" : assertion.getFailMessage();
                 assertion.setResult(result);
                 return result;
             }
             case assertEquals: {
-                Map<String, Object> context = SimpleJson.fromJson(response.getResponseBody().toString(), Map.class);
+                Map<String, Object> context = RestToolsJson.fromJson(response.getResponseBody().toString(), Map.class);
                 String actual = MVEL.evalToString(assertion.getActualValue(), context);
                 String result = actual.contains((String) assertion.getExpectedValue()) ? "pass" : assertion.getFailMessage();
                 assertion.setResult(result);
                 return result;
             }
             case assertNotEmpty: {
-                Map<String, Object> context = SimpleJson.fromJson(response.getResponseBody().toString(), Map.class);
+                Map<String, Object> context = RestToolsJson.fromJson(response.getResponseBody().toString(), Map.class);
                 String actual = MVEL.evalToString(assertion.getActualValue(), context);
                 String result = actual.length() > 0 ? "pass" : assertion.getFailMessage();
                 assertion.setResult(result);

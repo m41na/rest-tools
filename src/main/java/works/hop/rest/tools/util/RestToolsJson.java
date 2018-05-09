@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 
-public class SimpleJson {
+public class RestToolsJson {
 
     public static ObjectMapper provideObjectMapper() {
         return new ObjectMapper();

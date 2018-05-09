@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import works.hop.rest.tools.util.SimpleJson;
+import works.hop.rest.tools.util.RestToolsJson;
 
 public class ApiReq implements Serializable {
 
@@ -210,7 +210,7 @@ public class ApiReq implements Serializable {
 
     @Override
     public String toString() {
-        String output = SimpleJson.toJson(this);
+        String output = RestToolsJson.toJson(this);
         return output;
     }
 }

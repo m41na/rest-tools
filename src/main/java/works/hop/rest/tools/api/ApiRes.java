@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import works.hop.rest.tools.util.SimpleJson;
+import works.hop.rest.tools.util.RestToolsJson;
 
 public class ApiRes<T> implements Serializable {
 
@@ -57,7 +57,7 @@ public class ApiRes<T> implements Serializable {
     
     @Override
     public String toString() {
-        String output = SimpleJson.toJson(this);
+        String output = RestToolsJson.toJson(this);
         return output;
     }
 }

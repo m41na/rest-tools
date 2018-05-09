@@ -12,7 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import works.hop.rest.tools.util.SimpleJson;
+import works.hop.rest.tools.util.RestToolsJson;
 
 public class EndpointConfig {
 
@@ -301,7 +301,7 @@ public class EndpointConfig {
 
     @Override
     public String toString() {
-        return SimpleJson.toJson(this);
+        return RestToolsJson.toJson(this);
     }
 
     public static void main(String... args) {

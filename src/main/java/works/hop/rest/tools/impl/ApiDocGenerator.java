@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 import works.hop.rest.tools.annotation.Api;
 import works.hop.rest.tools.api.ApiReq;
 import works.hop.rest.tools.api.ApiReqBuilder;
-import works.hop.rest.tools.util.SimpleJson;
+import works.hop.rest.tools.util.RestToolsJson;
 
 /**
  * Base class for generating API documentation based on available and correctly
@@ -385,7 +385,7 @@ public abstract class ApiDocGenerator {
         } else {
             // try using default constructor
             try {
-                return SimpleJson.toJson(clazz.newInstance());
+                return RestToolsJson.toJson(clazz.newInstance());
             } catch (IllegalAccessException | InstantiationException e) {
                 throw new RuntimeException("The class should have a default constructor", e);
             }

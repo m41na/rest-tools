@@ -21,7 +21,7 @@ import freemarker.template.Template;
 import freemarker.template.TemplateExceptionHandler;
 import works.hop.rest.tools.api.ApiReqComparator;
 import works.hop.rest.tools.api.ApiReq;
-import works.hop.rest.tools.util.SimpleJson;
+import works.hop.rest.tools.util.RestToolsJson;
 
 public class TemplateEngine {
 
@@ -101,7 +101,7 @@ public class TemplateEngine {
             int length = inputStream.read(responseBytes, 0, SIZE);
             String sampleResponse = new String(responseBytes, 0, length);
 
-            ApiReq endpoint = SimpleJson.fromJson(sampleResponse, ApiReq.class);
+            ApiReq endpoint = RestToolsJson.fromJson(sampleResponse, ApiReq.class);
             System.out.println(new TemplateEngine().mergeWithTemplates(Arrays.asList(endpoint), false));
         }
     }
