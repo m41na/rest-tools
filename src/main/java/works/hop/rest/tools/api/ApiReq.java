@@ -170,34 +170,37 @@ public class ApiReq implements Serializable {
         this.execute = execute;
     }
 
-    public ApiReq copySelfTo(ApiReq guest) {
+    public ApiReq copySelfTo(ApiReq target) {
         //ensure first that id, method and path do match
-        if (!this.name.equalsIgnoreCase(guest.getName())
-                || !this.method.equalsIgnoreCase(guest.getMethod())
-                || !this.path.equalsIgnoreCase(guest.path)) {
-            throw new RuntimeException(String.format("Looks like these two endpoints \r\n %s \r\n AND \r\n %s \r\n do not quite match", this, guest));
+        if (!this.name.equalsIgnoreCase(target.getName())
+                || !this.method.equalsIgnoreCase(target.getMethod())
+                || !this.path.equalsIgnoreCase(target.path)) {
+            throw new RuntimeException(String.format("Looks like these two endpoints \r\n %s \r\n AND \r\n %s \r\n do not quite match", this, target));
         }
         //copy without remorse
-        if (queryParams != null) {
-            guest.setQueryParams(queryParams);
+        if(pathParams != null){
+            target.setPathParams(pathParams);
         }
-        if (consumes != null) {
-            guest.setConsumes(consumes);
+        if (queryParams != null) {
+            target.setQueryParams(queryParams);
         }
         if (descr != null) {
-            guest.setDescr(descr);
+            target.setDescr(descr);
         }
         if (headers != null) {
-            guest.setHeaders(headers);
+            target.setHeaders(headers);
+        }
+        if (consumes != null) {
+            target.setConsumes(consumes);
         }
         if (produces != null) {
-            guest.setProduces(produces);
+            target.setProduces(produces);
         }
         if (entity != null && entity.trim().length() > 0) {
-            guest.setEntity(entity);
+            target.setEntity(entity);
         }
         //return happy guest
-        return guest;
+        return target;
     }
 
     public Map<String, String> getEnvs() {

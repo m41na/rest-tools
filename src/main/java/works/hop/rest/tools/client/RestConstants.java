@@ -1,6 +1,6 @@
 package works.hop.rest.tools.client;
 
-public interface RestKeys {
+public interface RestConstants {
     
     /**
      * Endpoint definition

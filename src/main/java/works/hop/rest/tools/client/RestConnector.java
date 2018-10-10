@@ -23,7 +23,7 @@ import works.hop.rest.tools.handler.ApacheOptionsHandler;
 import works.hop.rest.tools.handler.ApachePostHandler;
 import works.hop.rest.tools.handler.ApachePutHandler;
 
-public class RestConnector implements Runnable, RestKeys {
+public class RestConnector implements Runnable, RestConstants {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestConnector.class);
     private JsonLoader jsonLoader;
@@ -71,7 +71,7 @@ public class RestConnector implements Runnable, RestKeys {
     }
 
     public static List<ApiReq> mergeEndpoints(ApiReq base, List<ApiReq> endpoints) {
-        endpoints.stream().map((rep) -> {
+        endpoints.stream().forEach((rep) -> {
             // override url if a key is provided instead of a valid url
             String urlValue = rep.getUrl();
             if (isNotEmpty(urlValue)) {
@@ -86,39 +86,38 @@ public class RestConnector implements Runnable, RestKeys {
             } else {
                 rep.setUrl(base.getUrl());
             }
-            return rep;
-        }).map((rep) -> {
+            //check 'execute'
+            if (rep.getExecute() == null) {
+                rep.setExecute(Boolean.TRUE);
+            }
+            //check 'method'
             if (isEmpty(rep.getMethod())) {
                 rep.setMethod(base.getMethod());
             }
-            return rep;
-        }).map((rep) -> {
+            //check 'path'
             if (isEmpty(rep.getPath())) {
                 rep.setPath(base.getPath());
             }
-            return rep;
-        }).map((rep) -> {
+            //check 'request body'
             if (isEmpty(rep.getEntity())) {
                 rep.setEntity(base.getEntity());
             }
-            return rep;
-        }).map((rep) -> {
+            //check 'response body'
             if (rep.getResponse().getResponseBody() == null) {
                 rep.getResponse().setResponseBody(base.getResponse().getResponseBody());
             }
-            return rep;
-        }).map((ApiReq rep) -> {
+            //check 'response status code'
             if (rep.getResponse().getStatusCode() == null) {
                 rep.getResponse().setStatusCode(base.getResponse().getStatusCode());
             }
-            return rep;
-        }).map((rep) -> {
+            //check 'consumes'
             if (isEmpty(rep.getConsumes())) {
                 rep.setConsumes(base.getConsumes());
             }
-            return rep;
-        }).filter((rep) -> (isEmpty(rep.getProduces()))).forEachOrdered((rep) -> {
-            rep.setProduces(base.getProduces());
+            //check 'produces'
+            if(isEmpty(rep.getProduces())){
+                rep.setProduces(base.getProduces());
+            }
         });
         return endpoints;
     }
