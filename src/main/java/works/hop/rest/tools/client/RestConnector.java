@@ -1,20 +1,17 @@
 package works.hop.rest.tools.client;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Arrays;
-import java.util.Objects;
-import works.hop.rest.tools.api.ApiAssert;
 
-import works.hop.rest.tools.api.ApiReq;
-import works.hop.rest.tools.api.ApiRes;
 import works.hop.rest.tools.api.search.ApiInfoSearch;
 import works.hop.rest.tools.handler.ApacheDeleteHandler;
 import works.hop.rest.tools.handler.ApacheGetHandler;
@@ -22,6 +19,9 @@ import works.hop.rest.tools.handler.ApacheHeadHandler;
 import works.hop.rest.tools.handler.ApacheOptionsHandler;
 import works.hop.rest.tools.handler.ApachePostHandler;
 import works.hop.rest.tools.handler.ApachePutHandler;
+import works.hop.rest.tools.model.ApiAssert;
+import works.hop.rest.tools.model.ApiReq;
+import works.hop.rest.tools.model.ApiRes;
 
 public class RestConnector implements Runnable, RestConstants {
 
@@ -56,7 +56,7 @@ public class RestConnector implements Runnable, RestConstants {
         this.responseListener = responseListener;
     }
 
-    public void notifyResponse(ApiRes response, List<ApiAssert<?>> assertions) {
+    public void notifyResponse(ApiRes response, List<ApiAssert> assertions) {
         if (getResponseListener() != null) {
             getResponseListener().onReadyResponse(response, assertions);
         }

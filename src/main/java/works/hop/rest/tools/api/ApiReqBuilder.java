@@ -11,6 +11,8 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Produces;
 
+import works.hop.rest.tools.model.ApiReq;
+
 public class ApiReqBuilder {
 
     protected Map<String, ApiAnnotationHandler> handlers = new HashMap<>();

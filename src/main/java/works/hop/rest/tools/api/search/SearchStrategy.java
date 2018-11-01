@@ -2,7 +2,7 @@ package works.hop.rest.tools.api.search;
 
 import java.util.List;
 
-import works.hop.rest.tools.api.ApiReq;
+import works.hop.rest.tools.model.ApiReq;
 
 public interface SearchStrategy {
 

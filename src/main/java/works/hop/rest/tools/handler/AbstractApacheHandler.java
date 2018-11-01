@@ -1,12 +1,16 @@
 package works.hop.rest.tools.handler;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.security.KeyManagementException;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -54,17 +58,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.ByteArrayOutputStream;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 
-import works.hop.rest.tools.api.ApiReq;
-import works.hop.rest.tools.api.ApiRes;
 import works.hop.rest.tools.api.RequestHandler;
 import works.hop.rest.tools.client.FileDataReader;
 import works.hop.rest.tools.client.FileDataReader.ByteArrayCallback;
 import works.hop.rest.tools.client.FileDataReader.StringCallback;
+import works.hop.rest.tools.model.ApiReq;
+import works.hop.rest.tools.model.ApiRes;
 
 public abstract class AbstractApacheHandler<T> implements RequestHandler<T> {
 

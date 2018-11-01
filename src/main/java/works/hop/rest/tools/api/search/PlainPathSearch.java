@@ -3,8 +3,8 @@ package works.hop.rest.tools.api.search;
 import java.util.Collections;
 import java.util.List;
 
-import works.hop.rest.tools.api.ApiReq;
 import works.hop.rest.tools.api.ApiReqComparator;
+import works.hop.rest.tools.model.ApiReq;
 
 public class PlainPathSearch implements SearchStrategy {
 

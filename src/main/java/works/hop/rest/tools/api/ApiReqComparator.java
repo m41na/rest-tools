@@ -2,6 +2,8 @@ package works.hop.rest.tools.api;
 
 import java.util.Comparator;
 
+import works.hop.rest.tools.model.ApiReq;
+
 /**
  * Search for item. Best match is when paths match, otherwise use path and
  * method combo.

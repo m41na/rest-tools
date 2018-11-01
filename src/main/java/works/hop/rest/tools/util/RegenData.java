@@ -1,17 +1,18 @@
 package works.hop.rest.tools.util;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import works.hop.rest.tools.api.ApiReqComparator;
 
-import works.hop.rest.tools.api.ApiReq;
+import com.fasterxml.jackson.core.type.TypeReference;
+
+import works.hop.rest.tools.api.ApiReqComparator;
 import works.hop.rest.tools.client.ClassPathJsonLoader;
 import works.hop.rest.tools.client.JsonLoader;
 import works.hop.rest.tools.client.RestConnector;
+import works.hop.rest.tools.model.ApiReq;
 
 public class RegenData {
 

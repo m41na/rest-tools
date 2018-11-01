@@ -1,14 +1,15 @@
 package works.hop.rest.tools.client;
 
 import java.util.List;
-import works.hop.rest.tools.api.ApiAssert;
-import works.hop.rest.tools.api.ApiRes;
+
+import works.hop.rest.tools.model.ApiAssert;
+import works.hop.rest.tools.model.ApiRes;
 
 public interface ApiResListener {
 
     ApiRes getApiResponse();
     
-    List<ApiAssert<?>> getApiAssertions();
+    List<ApiAssert> getApiAssertions();
     
-    void onReadyResponse(ApiRes response, List<ApiAssert<?>> assertions);
+    void onReadyResponse(ApiRes response, List<ApiAssert> assertions);
 }

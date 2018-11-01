@@ -1,12 +1,17 @@
 package works.hop.rest.tools.api;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+
 import java.io.IOException;
-import org.hamcrest.Matcher;
+
 import org.hamcrest.core.StringContains;
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import works.hop.rest.tools.model.ApiAssert;
 
 public class ApiAssertTest {
 

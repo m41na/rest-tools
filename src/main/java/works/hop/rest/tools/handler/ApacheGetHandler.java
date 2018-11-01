@@ -1,12 +1,13 @@
 package works.hop.rest.tools.handler;
 
 import java.io.IOException;
+
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 
-import works.hop.rest.tools.api.ApiReq;
-import works.hop.rest.tools.api.ApiRes;
+import works.hop.rest.tools.model.ApiReq;
+import works.hop.rest.tools.model.ApiRes;
 
 public class ApacheGetHandler extends AbstractApacheHandler<ApiRes> {
 

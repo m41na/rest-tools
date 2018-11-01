@@ -2,21 +2,23 @@ package works.hop.rest.tools.client;
 
 import java.util.List;
 import java.util.Map;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.mvel2.MVEL;
-import works.hop.rest.tools.api.ApiAssert;
-import works.hop.rest.tools.api.ApiRes;
+
+import works.hop.rest.tools.model.ApiAssert;
+import works.hop.rest.tools.model.ApiRes;
 import works.hop.rest.tools.util.RestToolsJson;
 
 public class AssertionResListener implements ApiResListener {
 
     private ApiRes response;
-    private List<ApiAssert<?>> assertions;
+    private List<ApiAssert> assertions;
 
     @Override
-    public void onReadyResponse(ApiRes response, List<ApiAssert<?>> assertions) {
+    public void onReadyResponse(ApiRes response, List<ApiAssert> assertions) {
         this.response = response;
         this.assertions = assertions;
         if (assertions != null && assertions.size() > 0) {
@@ -35,7 +37,7 @@ public class AssertionResListener implements ApiResListener {
     }
 
     @Override
-    public List<ApiAssert<?>> getApiAssertions() {
+    public List<ApiAssert> getApiAssertions() {
         return this.assertions;
     }
 

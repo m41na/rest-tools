@@ -28,8 +28,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import works.hop.rest.tools.annotation.Api;
-import works.hop.rest.tools.api.ApiReq;
 import works.hop.rest.tools.api.ApiReqBuilder;
+import works.hop.rest.tools.model.ApiReq;
 import works.hop.rest.tools.util.RestToolsJson;
 
 /**
