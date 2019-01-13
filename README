@@ -14,7 +14,7 @@ a)	url=http://localhost:8081/rws/
 
 As you can very well guess, this points to the target server on which this application will run against
 
-b)	basePackage=works.hop.rest.resource
+b)	basePackage=com.practicaldime.rest.resource
 
 This tells the application which base package to start looking up for Resource classes. Currently you can only have one value for base resource. Probably I�ll enhance this at some point to take multiple values
 
@@ -22,7 +22,7 @@ c)	inspectAll=false
 
 This tells the application whether to inspect all the Resources discovered under the base package. By setting the value to �false�, then the application will look at �targetedResources� and �targetedEndpoints� to determine what to inspect. Setting the value to �true� will ignore anything you have set for �targetedResources��and �targetedEndpoints��
 
-d)	targetedResources=works.hop.rest.resource.UsersResource
+d)	targetedResources=com.practicaldime.rest.resource.UsersResource
 
 This will tell the application which class to inspect/analyse. The application will of course expect this Resource to have been discovered in the base package. You can put multiple class name. To do so, use semi-colon (;) or comma (,) to separate the values
 
