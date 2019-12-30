@@ -2,7 +2,7 @@ package com.practicaldime.rest.tools.api.search;
 
 import java.util.List;
 
-import com.practicaldime.rest.tools.model.ApiReq;
+import com.practicaldime.rest.tools.api.ApiReq;
 
 public class ApiInfoSearch {
 

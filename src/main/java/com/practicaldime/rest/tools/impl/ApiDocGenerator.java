@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import com.practicaldime.rest.tools.annotation.Api;
 import com.practicaldime.rest.tools.api.ApiReqBuilder;
-import com.practicaldime.rest.tools.model.ApiReq;
+import com.practicaldime.rest.tools.api.ApiReq;
 import com.practicaldime.rest.tools.util.RestToolsJson;
 
 /**

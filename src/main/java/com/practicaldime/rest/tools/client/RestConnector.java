@@ -19,9 +19,9 @@ import com.practicaldime.rest.tools.handler.ApacheHeadHandler;
 import com.practicaldime.rest.tools.handler.ApacheOptionsHandler;
 import com.practicaldime.rest.tools.handler.ApachePostHandler;
 import com.practicaldime.rest.tools.handler.ApachePutHandler;
-import com.practicaldime.rest.tools.model.ApiAssert;
-import com.practicaldime.rest.tools.model.ApiReq;
-import com.practicaldime.rest.tools.model.ApiRes;
+import com.practicaldime.rest.tools.api.ApiAssert;
+import com.practicaldime.rest.tools.api.ApiReq;
+import com.practicaldime.rest.tools.api.ApiRes;
 
 public class RestConnector implements Runnable, RestConstants {
 

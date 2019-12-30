@@ -6,8 +6,8 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.impl.client.CloseableHttpClient;
 
-import com.practicaldime.rest.tools.model.ApiReq;
-import com.practicaldime.rest.tools.model.ApiRes;
+import com.practicaldime.rest.tools.api.ApiReq;
+import com.practicaldime.rest.tools.api.ApiRes;
 
 public class ApacheHeadHandler extends AbstractApacheHandler<ApiRes> {
 

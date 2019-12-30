@@ -63,8 +63,8 @@ import com.practicaldime.rest.tools.api.RequestHandler;
 import com.practicaldime.rest.tools.client.FileDataReader;
 import com.practicaldime.rest.tools.client.FileDataReader.ByteArrayCallback;
 import com.practicaldime.rest.tools.client.FileDataReader.StringCallback;
-import com.practicaldime.rest.tools.model.ApiReq;
-import com.practicaldime.rest.tools.model.ApiRes;
+import com.practicaldime.rest.tools.api.ApiReq;
+import com.practicaldime.rest.tools.api.ApiRes;
 
 public abstract class AbstractApacheHandler<T> implements RequestHandler<T> {
 

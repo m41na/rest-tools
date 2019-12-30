@@ -8,8 +8,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.mvel2.MVEL;
 
-import com.practicaldime.rest.tools.model.ApiAssert;
-import com.practicaldime.rest.tools.model.ApiRes;
+import com.practicaldime.rest.tools.api.ApiAssert;
+import com.practicaldime.rest.tools.api.ApiRes;
 import com.practicaldime.rest.tools.util.RestToolsJson;
 
 public class AssertionResListener implements ApiResListener {

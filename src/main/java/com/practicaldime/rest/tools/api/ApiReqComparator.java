@@ -2,7 +2,7 @@ package com.practicaldime.rest.tools.api;
 
 import java.util.Comparator;
 
-import com.practicaldime.rest.tools.model.ApiReq;
+import com.practicaldime.rest.tools.api.ApiReq;
 
 /**
  * Search for item. Best match is when paths match, otherwise use path and

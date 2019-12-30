@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.practicaldime.rest.tools.api.ApiReqComparator;
-import com.practicaldime.rest.tools.model.ApiReq;
+import com.practicaldime.rest.tools.api.ApiReq;
 
 public class PlainPathSearch implements SearchStrategy {
 

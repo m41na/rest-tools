@@ -11,7 +11,7 @@ import org.junit.Test;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.practicaldime.rest.tools.model.ApiAssert;
+import com.practicaldime.rest.tools.api.ApiAssert;
 
 public class ApiAssertTest {
 

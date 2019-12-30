@@ -12,7 +12,7 @@ import com.practicaldime.rest.tools.api.ApiReqComparator;
 import com.practicaldime.rest.tools.client.ClassPathJsonLoader;
 import com.practicaldime.rest.tools.client.JsonLoader;
 import com.practicaldime.rest.tools.client.RestConnector;
-import com.practicaldime.rest.tools.model.ApiReq;
+import com.practicaldime.rest.tools.api.ApiReq;
 
 public class RegenData {
 
