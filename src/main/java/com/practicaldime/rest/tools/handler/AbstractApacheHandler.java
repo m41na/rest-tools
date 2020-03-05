@@ -7,16 +7,12 @@ import com.practicaldime.rest.tools.api.RequestHandler;
 import com.practicaldime.rest.tools.client.FileDataReader;
 import com.practicaldime.rest.tools.client.FileDataReader.ByteArrayCallback;
 import com.practicaldime.rest.tools.client.FileDataReader.StringCallback;
-import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.http.*;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.HttpClientConnectionManager;
@@ -33,6 +29,7 @@ import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
@@ -293,25 +290,22 @@ public abstract class AbstractApacheHandler<T> implements RequestHandler<T> {
      * @return
      */
     protected String processRequestWithHttpClient(String url) {
-        HttpClient client = new HttpClient();
-        HttpMethod method = new GetMethod(url);
-        DefaultHttpMethodRetryHandler retryhandler = new DefaultHttpMethodRetryHandler(10, true);
-        client.getParams().setParameter(HttpMethodParams.RETRY_HANDLER, retryhandler);
-
-        try {
-            int code = client.executeMethod(method);
-            if (code != HttpStatus.SC_OK) {
-                LOG.error("Method failed: " + method.getStatusLine());
+        try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
+            HttpGet httpGet = new HttpGet(url);
+            try (CloseableHttpResponse response1 = httpclient.execute(httpGet)) {
+                System.out.println(response1.getStatusLine());
+                try (InputStream stream = response1.getEntity().getContent()) {
+                    String responseBody = readResponseStreamAsString(stream);
+                    System.out.println(responseBody);
+                    return responseBody;
+                } catch (IOException e) {
+                    LOG.error(String.format("There was an error making this request -> %s", e.getMessage()));
+                    throw new RuntimeException(e);
+                }
             }
-
-            String responseBody = readResponseStreamAsString(method.getResponseBodyAsStream());
-            System.out.println(responseBody);
-            return responseBody;
         } catch (IOException e) {
-            LOG.error(String.format("There was an error making this request -> %s", e.getMessage()));
-            throw new RuntimeException(e);
-        } finally {
-            method.releaseConnection();
+            e.printStackTrace(System.err);
+            return null;
         }
     }
 

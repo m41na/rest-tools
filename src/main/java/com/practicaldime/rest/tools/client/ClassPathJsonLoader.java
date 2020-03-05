@@ -17,7 +17,7 @@ public class ClassPathJsonLoader implements JsonLoader {
 
     public ClassPathJsonLoader(String sourceFile) {
         super();
-        this.sourceFile = sourceFile;
+        this.sourceFile = sourceFile.startsWith("/")? sourceFile.substring(1) : sourceFile;
     }
 
     @Override

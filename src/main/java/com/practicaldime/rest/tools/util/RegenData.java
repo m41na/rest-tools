@@ -17,9 +17,9 @@ public class RegenData {
     private static final Logger LOG = LoggerFactory.getLogger(RegenData.class);
 
     public static void main(String[] args) {
-        String ENDPOINTS_FILE = "/rest/sample-endpoints.json";
+        String ENDPOINTS_FILE = "rest/sample-endpoints.json";
         JsonLoader loader = new ClassPathJsonLoader(ENDPOINTS_FILE);
-        List<ApiReq> nodes = loader.readValue(new TypeReference<List<ApiReq>>() {
+        List<ApiReq> nodes = loader.readValue(new TypeReference<>() {
         });
         List<ApiReq> endpoints = RestConnector.mergeEndpoints(nodes);
         Collections.sort(endpoints, new ApiReqComparator());

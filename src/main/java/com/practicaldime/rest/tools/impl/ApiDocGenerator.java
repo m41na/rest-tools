@@ -4,18 +4,25 @@ import com.practicaldime.common.entity.rest.ApiReq;
 import com.practicaldime.rest.tools.annotation.Api;
 import com.practicaldime.rest.tools.api.ApiReqBuilder;
 import com.practicaldime.rest.tools.util.RestToolsJson;
-import org.glassfish.jersey.client.ClientConfig;
+import org.apache.commons.compress.utils.Lists;
+import org.apache.http.Header;
+import org.apache.http.HttpHeaders;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Invocation.Builder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Response;
 import java.io.File;
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -25,7 +32,7 @@ import java.util.regex.Pattern;
 
 /**
  * Base class for generating API documentation based on available and correctly
- * annotated end-points. Uses Jersey's client API to get the job done
+ * annotated end-points. Uses Apache's httpclient API to get the job done
  */
 public abstract class ApiDocGenerator {
 
@@ -107,10 +114,8 @@ public abstract class ApiDocGenerator {
             }
 
             @Override
-            public Client getRestClient() {
-                ClientConfig clientConfig = new ClientConfig();
-                Client client = ClientBuilder.newClient(clientConfig);
-                return client;
+            public CloseableHttpClient getRestClient() {
+                return HttpClients.createDefault();
             }
         };
         gen.start();
@@ -122,7 +127,7 @@ public abstract class ApiDocGenerator {
 
     public abstract void mergeWithOtherEndpoints(Collection<ApiReq> targetEndpoints);
 
-    public abstract Client getRestClient();
+    public abstract CloseableHttpClient getRestClient();
 
     public List<Class<?>> getResources(String packageName, List<Class<?>> list) throws Exception {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -320,14 +325,27 @@ public abstract class ApiDocGenerator {
                 if (!(contains(endpoint.getMethod(), config.getIgnoreMethods()))) {
                     if (serverIsUp()) {
                         LOG.info(String.format("fetching response for [%s] %s", endpoint.getMethod(), serviceURL));
-                        WebTarget resource = getRestClient().target(serviceURL);
-                        Response response = new EndpointRequest(resource.request()).accept(endpoint.getProduces().split(";")).contentType(endpoint.getConsumes().split(";"))
-                                .headers(endpoint.getHeaders()).requestEntity(endpoint.getEntity()).execute(endpoint.getMethod());
+                        //prepare headers
+                        Header accepts = new BasicHeader(HttpHeaders.ACCEPT, endpoint.getProduces());
+                        Header contentType = new BasicHeader(HttpHeaders.CONTENT_TYPE, endpoint.getConsumes());
+                        List<Header> headers = Lists.newArrayList();
+                        headers.add(accepts);
+                        headers.add(contentType);
+                        endpoint.getHeaders().forEach((key, value) -> headers.add(new BasicHeader(key, value)));
+                        //configure request (if need be)
+                        final RequestConfig requestConfig = RequestConfig.DEFAULT;
 
-                        String responseBody = response.readEntity(String.class);
-                        endpoint.getResponse().setResponseBody(responseBody.replaceAll("\\r|\\n", "").getBytes());
-                        // JSONObject json = new JSONObject(responseBody);
-                        // endpoint.setResponseBody(JsonFormatter.format(json));
+                        try (final CloseableHttpClient httpClient =
+                                     HttpClients.custom().setDefaultHeaders(headers).setDefaultRequestConfig(requestConfig).build()) {
+                            final HttpPost httpPost = new HttpPost(serviceURL);
+                            httpPost.setEntity(new StringEntity(endpoint.getEntity()));
+
+                            try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
+
+                                String responseBody = EntityUtils.toString(response.getEntity());
+                                endpoint.getResponse().setResponseBody(responseBody.replaceAll("\\r|\\n", "").getBytes());
+                            }
+                        }
                     }
                 } else {
                     LOG.info(String.format("skipping request for [%s] %s", endpoint.getMethod(), serviceURL));
@@ -376,14 +394,22 @@ public abstract class ApiDocGenerator {
         String aliveURL = config.getAliveEndpoint();
         if (aliveURL != null && aliveURL.trim().length() > 0) {
             String serviceURL = config.sanitizedURL(aliveURL);
-            WebTarget target = getRestClient().target(serviceURL);
-            Builder bld = target.request();
-            Map<String, String> headers = createApiReq().getHeaders();
-            headers.keySet().forEach((header) -> {
-                bld.header(header, headers.get(header));
-            });
-            Response response = bld.accept("text/plain").get();
-            return response.getStatus() == 200;
+            //prepare headers
+            List<Header> headers = Lists.newArrayList();
+            Header accepts = new BasicHeader(HttpHeaders.ACCEPT, "text/plain");
+            Header contentType = new BasicHeader(HttpHeaders.ACCEPT, "application/json");
+            headers.add(accepts);
+            headers.add(contentType);
+            createApiReq().getHeaders().forEach((key, value) -> headers.add(new BasicHeader(key, value)));
+
+            try (CloseableHttpClient httpClient = HttpClients.custom().setDefaultHeaders(headers).build()) {
+                HttpGet httpGet = new HttpGet(serviceURL);
+                try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
+                    return response.getStatusLine().getStatusCode() == 200;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return true;
     }
