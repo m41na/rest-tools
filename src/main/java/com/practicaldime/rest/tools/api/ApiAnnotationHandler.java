@@ -1,8 +1,8 @@
 package com.practicaldime.rest.tools.api;
 
-import java.lang.annotation.Annotation;
-
 import com.practicaldime.common.entity.rest.ApiReq;
+
+import java.lang.annotation.Annotation;
 
 public interface ApiAnnotationHandler {
 

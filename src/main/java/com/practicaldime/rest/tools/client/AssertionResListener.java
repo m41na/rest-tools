@@ -1,16 +1,15 @@
 package com.practicaldime.rest.tools.client;
 
-import java.util.List;
-import java.util.Map;
-
+import com.practicaldime.common.entity.rest.ApiAssert;
+import com.practicaldime.common.entity.rest.ApiRes;
+import com.practicaldime.rest.tools.util.RestToolsJson;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.mvel2.MVEL;
 
-import com.practicaldime.common.entity.rest.ApiAssert;
-import com.practicaldime.common.entity.rest.ApiRes;
-import com.practicaldime.rest.tools.util.RestToolsJson;
+import java.util.List;
+import java.util.Map;
 
 public class AssertionResListener implements ApiResListener {
 
@@ -64,14 +63,14 @@ public class AssertionResListener implements ApiResListener {
                 assertion.setResult(result);
                 return result;
             }
-            case assertElementExists:{
+            case assertElementExists: {
                 Document doc = Jsoup.parse(response.getResponseBody().toString());
                 Element element = doc.selectFirst(assertion.getActualValue());
                 String result = element != null ? "pass" : assertion.getFailMessage();
                 assertion.setResult(result);
                 return result;
             }
-            case assertElementTextContains:{
+            case assertElementTextContains: {
                 Document doc = Jsoup.parse(response.getResponseBody().toString());
                 Element element = doc.selectFirst(assertion.getActualValue());
                 String result = element.text().contains((String) assertion.getExpectedValue()) ? "pass" : assertion.getFailMessage();

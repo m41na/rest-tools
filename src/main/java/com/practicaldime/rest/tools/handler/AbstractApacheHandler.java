@@ -1,36 +1,19 @@
 package com.practicaldime.rest.tools.handler;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManagerFactory;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.practicaldime.common.entity.rest.ApiReq;
+import com.practicaldime.common.entity.rest.ApiRes;
+import com.practicaldime.rest.tools.api.RequestHandler;
+import com.practicaldime.rest.tools.client.FileDataReader;
+import com.practicaldime.rest.tools.client.FileDataReader.ByteArrayCallback;
+import com.practicaldime.rest.tools.client.FileDataReader.StringCallback;
 import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpEntityEnclosingRequest;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
+import org.apache.http.*;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -57,18 +40,93 @@ import org.apache.http.ssl.SSLContexts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import com.practicaldime.rest.tools.api.RequestHandler;
-import com.practicaldime.rest.tools.client.FileDataReader;
-import com.practicaldime.rest.tools.client.FileDataReader.ByteArrayCallback;
-import com.practicaldime.rest.tools.client.FileDataReader.StringCallback;
-import com.practicaldime.common.entity.rest.ApiReq;
-import com.practicaldime.common.entity.rest.ApiRes;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
+import java.io.*;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public abstract class AbstractApacheHandler<T> implements RequestHandler<T> {
 
     protected static final Logger LOG = LoggerFactory.getLogger(AbstractApacheHandler.class);
+
+    public static SSLContext createSSLContext() {
+        try {
+            KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+            // InputStream stream = new
+            // FileInputStream("E:/IBM/WebSphere/AppServer/bin/keystore.p12");
+            ks.load(null, null);
+
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            tmf.init(ks);
+
+            final SSLContext ctx = SSLContext.getInstance("TLSv1.2");
+            ctx.init(null, tmf.getTrustManagers(), null);
+
+            return ctx;
+        } catch (IOException | KeyManagementException | KeyStoreException | NoSuchAlgorithmException | CertificateException e) {
+            e.printStackTrace(System.err);
+            throw new RuntimeException("Unable to create SSLContext", e);
+        }
+    }
+
+    public static CloseableHttpClient buildClientAlt() {
+        // plain http socket
+        ConnectionSocketFactory http = PlainConnectionSocketFactory.getSocketFactory();
+
+        // layered https socket
+        SSLContext ctx = createSSLContext();
+        final SSLConnectionSocketFactory https = new SSLConnectionSocketFactory(ctx, new NoopHostnameVerifier());
+
+        // socket registry
+        Registry<ConnectionSocketFactory> reg = RegistryBuilder.<ConnectionSocketFactory>create().register("http", http)
+                .register("https", https).build();
+
+        // client connection manager
+        HttpClientConnectionManager cm = new PoolingHttpClientConnectionManager(reg);
+
+        // configure client builder
+        final HttpClientBuilder builder = HttpClientBuilder.create();
+        RequestConfig config = RequestConfig.custom().setConnectTimeout(120 * 1000)
+                .setConnectionRequestTimeout(120 * 1000).setSocketTimeout(120 * 1000).build();
+        builder.setDefaultRequestConfig(config);
+        return builder.setConnectionManager(cm).build();
+    }
+
+    public static CloseableHttpClient buildClient() {
+        try {
+            // plain http socket
+            ConnectionSocketFactory http = PlainConnectionSocketFactory.getSocketFactory();
+
+            // layered https socket
+            SSLContext sslc = SSLContexts.custom().loadTrustMaterial((TrustStrategy) (X509Certificate[] chain, String authType) -> true).build();
+            SSLConnectionSocketFactory https = new SSLConnectionSocketFactory(sslc, NoopHostnameVerifier.INSTANCE);
+
+            // socket registry
+            Registry<ConnectionSocketFactory> reg = RegistryBuilder.<ConnectionSocketFactory>create()
+                    .register("http", http).register("https", https).build();
+
+            // client connection manager
+            HttpClientConnectionManager cm = new PoolingHttpClientConnectionManager(reg);
+
+            // configure client builder
+            final HttpClientBuilder builder = HttpClientBuilder.create();
+            RequestConfig config = RequestConfig.custom().setConnectTimeout(300 * 1000)
+                    .setConnectionRequestTimeout(300 * 1000).setSocketTimeout(300 * 1000).build();
+            builder.setDefaultRequestConfig(config);
+            return builder.setConnectionManager(cm).build();
+        } catch (KeyManagementException | KeyStoreException | NoSuchAlgorithmException e) {
+            e.printStackTrace(System.err);
+            throw new RuntimeException("Unable to create http client", e);
+        }
+    }
 
     public Header[] createHeaders(ApiReq rep) {
         List<Header> headersList = new ArrayList<>();
@@ -214,7 +272,7 @@ public abstract class AbstractApacheHandler<T> implements RequestHandler<T> {
         th.printStackTrace(new PrintWriter(sw));
         return sw.toString();
     }
-    
+
     protected byte[] readResponseStream(InputStream response) throws IOException {
         return FileDataReader.readBytes(response);
     }
@@ -264,7 +322,7 @@ public abstract class AbstractApacheHandler<T> implements RequestHandler<T> {
             return responseBody;
         };
     }
-    
+
     protected ResponseHandler<String> readResponseAsStringHandler() {
         return (HttpResponse response) -> {
             HttpEntity entity = response.getEntity();
@@ -282,76 +340,5 @@ public abstract class AbstractApacheHandler<T> implements RequestHandler<T> {
         }
         String responseBody = readResponseAsStringHandler().handleResponse(response);
         res.setResponseBody(responseBody);
-    }
-
-    public static SSLContext createSSLContext() {
-        try {
-            KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
-            // InputStream stream = new
-            // FileInputStream("E:/IBM/WebSphere/AppServer/bin/keystore.p12");
-            ks.load(null, null);
-
-            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-            tmf.init(ks);
-
-            final SSLContext ctx = SSLContext.getInstance("TLSv1.2");
-            ctx.init(null, tmf.getTrustManagers(), null);
-
-            return ctx;
-        } catch (IOException | KeyManagementException | KeyStoreException | NoSuchAlgorithmException | CertificateException e) {
-            e.printStackTrace(System.err);
-            throw new RuntimeException("Unable to create SSLContext", e);
-        }
-    }
-
-    public static CloseableHttpClient buildClientAlt() {
-        // plain http socket
-        ConnectionSocketFactory http = PlainConnectionSocketFactory.getSocketFactory();
-
-        // layered https socket
-        SSLContext ctx = createSSLContext();
-        final SSLConnectionSocketFactory https = new SSLConnectionSocketFactory(ctx, new NoopHostnameVerifier());
-
-        // socket registry
-        Registry<ConnectionSocketFactory> reg = RegistryBuilder.<ConnectionSocketFactory>create().register("http", http)
-                .register("https", https).build();
-
-        // client connection manager
-        HttpClientConnectionManager cm = new PoolingHttpClientConnectionManager(reg);
-
-        // configure client builder
-        final HttpClientBuilder builder = HttpClientBuilder.create();
-        RequestConfig config = RequestConfig.custom().setConnectTimeout(120 * 1000)
-                .setConnectionRequestTimeout(120 * 1000).setSocketTimeout(120 * 1000).build();
-        builder.setDefaultRequestConfig(config);
-        return builder.setConnectionManager(cm).build();
-    }
-
-    public static CloseableHttpClient buildClient() {
-        try {
-            // plain http socket
-            ConnectionSocketFactory http = PlainConnectionSocketFactory.getSocketFactory();
-
-            // layered https socket
-            SSLContext sslc = SSLContexts.custom().loadTrustMaterial((TrustStrategy) (X509Certificate[] chain, String authType) -> true).build();
-            SSLConnectionSocketFactory https = new SSLConnectionSocketFactory(sslc, NoopHostnameVerifier.INSTANCE);
-
-            // socket registry
-            Registry<ConnectionSocketFactory> reg = RegistryBuilder.<ConnectionSocketFactory>create()
-                    .register("http", http).register("https", https).build();
-
-            // client connection manager
-            HttpClientConnectionManager cm = new PoolingHttpClientConnectionManager(reg);
-
-            // configure client builder
-            final HttpClientBuilder builder = HttpClientBuilder.create();
-            RequestConfig config = RequestConfig.custom().setConnectTimeout(300 * 1000)
-                    .setConnectionRequestTimeout(300 * 1000).setSocketTimeout(300 * 1000).build();
-            builder.setDefaultRequestConfig(config);
-            return builder.setConnectionManager(cm).build();
-        } catch (KeyManagementException | KeyStoreException | NoSuchAlgorithmException e) {
-            e.printStackTrace(System.err);
-            throw new RuntimeException("Unable to create http client", e);
-        }
     }
 }

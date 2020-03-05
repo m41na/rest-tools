@@ -1,13 +1,12 @@
 package com.practicaldime.rest.tools.handler;
 
-import java.io.IOException;
-
+import com.practicaldime.common.entity.rest.ApiReq;
+import com.practicaldime.common.entity.rest.ApiRes;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.impl.client.CloseableHttpClient;
 
-import com.practicaldime.common.entity.rest.ApiReq;
-import com.practicaldime.common.entity.rest.ApiRes;
+import java.io.IOException;
 
 public class ApachePutHandler extends AbstractApacheHandler<ApiRes> {
 

@@ -1,8 +1,8 @@
 package com.practicaldime.rest.tools.api.search;
 
-import java.util.List;
-
 import com.practicaldime.common.entity.rest.ApiReq;
+
+import java.util.List;
 
 public interface SearchStrategy {
 

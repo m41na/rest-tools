@@ -1,27 +1,16 @@
 package com.practicaldime.rest.tools.impl;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.practicaldime.common.entity.rest.ApiReq;
+import com.practicaldime.rest.tools.api.ApiReqComparator;
+import com.practicaldime.rest.tools.util.RestToolsJson;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateExceptionHandler;
-import com.practicaldime.rest.tools.api.ApiReqComparator;
-import com.practicaldime.common.entity.rest.ApiReq;
-import com.practicaldime.rest.tools.util.RestToolsJson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.util.*;
 
 public class TemplateEngine {
 
@@ -45,6 +34,18 @@ public class TemplateEngine {
             instance = new TemplateEngine();
         }
         return instance;
+    }
+
+    public static void main(String... args) throws Exception {
+        int SIZE = 2048;
+        byte[] responseBytes = new byte[SIZE];
+        try (InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("rest/sample-json-response.txt")) {
+            int length = inputStream.read(responseBytes, 0, SIZE);
+            String sampleResponse = new String(responseBytes, 0, length);
+
+            ApiReq endpoint = RestToolsJson.fromJson(sampleResponse, ApiReq.class);
+            System.out.println(new TemplateEngine().mergeWithTemplates(Arrays.asList(endpoint), false));
+        }
     }
 
     public Configuration config() {
@@ -92,17 +93,5 @@ public class TemplateEngine {
 
         //return generated RAML
         return apiDocBuilder.toString();
-    }
-
-    public static void main(String... args) throws Exception {
-        int SIZE = 2048;
-        byte[] responseBytes = new byte[SIZE];
-        try (InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("rest/sample-json-response.txt")) {
-            int length = inputStream.read(responseBytes, 0, SIZE);
-            String sampleResponse = new String(responseBytes, 0, length);
-
-            ApiReq endpoint = RestToolsJson.fromJson(sampleResponse, ApiReq.class);
-            System.out.println(new TemplateEngine().mergeWithTemplates(Arrays.asList(endpoint), false));
-        }
     }
 }

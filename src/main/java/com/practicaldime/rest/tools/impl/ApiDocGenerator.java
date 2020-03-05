@@ -1,19 +1,12 @@
 package com.practicaldime.rest.tools.impl;
 
-import java.io.File;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.practicaldime.common.entity.rest.ApiReq;
+import com.practicaldime.rest.tools.annotation.Api;
+import com.practicaldime.rest.tools.api.ApiReqBuilder;
+import com.practicaldime.rest.tools.util.RestToolsJson;
+import org.glassfish.jersey.client.ClientConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
@@ -22,20 +15,17 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
-
-import org.glassfish.jersey.client.ClientConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.practicaldime.rest.tools.annotation.Api;
-import com.practicaldime.rest.tools.api.ApiReqBuilder;
-import com.practicaldime.common.entity.rest.ApiReq;
-import com.practicaldime.rest.tools.util.RestToolsJson;
+import java.io.File;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Base class for generating API documentation based on available and correctly
  * annotated end-points. Uses Jersey's client API to get the job done
- *
  */
 public abstract class ApiDocGenerator {
 
@@ -48,6 +38,82 @@ public abstract class ApiDocGenerator {
         super();
         this.config = config;
         this.builder = builder;
+    }
+
+    public static boolean contains(String obj, String[] either) {
+        for (String o : either) {
+            if (obj.equalsIgnoreCase(o)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean matches(Pattern pattern, String... items) {
+        for (String item : items) {
+            Matcher matcher = pattern.matcher(item);
+            if (matcher.find()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean matchesBySimpleClassName(String clsName, String[] either) {
+        for (String name : either) {
+            if (clsName.endsWith(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static Annotation[] hasTargetAnnotation(Method method, Class<?> target) {
+        Annotation[] annotations = method.getAnnotations();
+        for (Annotation anno : annotations) {
+            if (anno.annotationType().equals(target)) {
+                return annotations;
+            }
+        }
+        return null;
+    }
+
+    public static Annotation fetchAnnotation(Annotation[] annotations, Class<?> target) {
+        for (Annotation anno : annotations) {
+            if (anno.annotationType().equals(target)) {
+                return anno;
+            }
+        }
+        return null;
+    }
+
+    public static void main(String[] args) {
+        EndpointConfig config = EndpointConfig.build("rest/api-gen-config.properties");
+        ApiDocGenerator gen = new ApiDocGenerator(config, new ApiReqBuilder()) {
+
+            @Override
+            public ApiReq createApiReq() {
+                return new ApiReq();
+            }
+
+            @Override
+            public void mergeWithOtherEndpoints(Collection<ApiReq> targetEndpoints) {
+                // TODO: write implementation if need be
+            }
+
+            @Override
+            public String getEndpointDefinitions() {
+                return config.getEndpointDefinitions();
+            }
+
+            @Override
+            public Client getRestClient() {
+                ClientConfig clientConfig = new ClientConfig();
+                Client client = ClientBuilder.newClient(clientConfig);
+                return client;
+            }
+        };
+        gen.start();
     }
 
     public abstract ApiReq createApiReq();
@@ -108,7 +174,7 @@ public abstract class ApiDocGenerator {
         List<String> targetedList = Arrays.asList(config.getTargetedEndpoints());
         List<Method> methods = new ArrayList<>(Arrays.asList(resourceClass.getMethods()));
 
-        for (Iterator<Method> iter = methods.iterator(); iter.hasNext();) {
+        for (Iterator<Method> iter = methods.iterator(); iter.hasNext(); ) {
             Method method = iter.next();
             Boolean dropMethod = Boolean.TRUE;
             String endpointId = null;
@@ -186,15 +252,14 @@ public abstract class ApiDocGenerator {
                     // populate headers with test data if available
                     for (String header : doc.headers()) {
                         int index = header.indexOf(':');
-                        if(index == -1){
+                        if (index == -1) {
                             index = header.indexOf('=');
                         }
-                        if(index > -1){
+                        if (index > -1) {
                             String key = header.substring(0, index);
                             String value = header.substring(index + 1);
                             endpoint.addHeader(key, value);
-                        }
-                        else{
+                        } else {
                             endpoint.addHeader(header, "");
                         }
                     }
@@ -332,53 +397,6 @@ public abstract class ApiDocGenerator {
         return false;
     }
 
-    public static boolean contains(String obj, String[] either) {
-        for (String o : either) {
-            if (obj.equalsIgnoreCase(o)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static boolean matches(Pattern pattern, String... items) {
-        for (String item : items) {
-            Matcher matcher = pattern.matcher(item);
-            if (matcher.find()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static boolean matchesBySimpleClassName(String clsName, String[] either) {
-        for (String name : either) {
-            if (clsName.endsWith(name)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static Annotation[] hasTargetAnnotation(Method method, Class<?> target) {
-        Annotation[] annotations = method.getAnnotations();
-        for (Annotation anno : annotations) {
-            if (anno.annotationType().equals(target)) {
-                return annotations;
-            }
-        }
-        return null;
-    }
-
-    public static Annotation fetchAnnotation(Annotation[] annotations, Class<?> target) {
-        for (Annotation anno : annotations) {
-            if (anno.annotationType().equals(target)) {
-                return anno;
-            }
-        }
-        return null;
-    }
-
     private String getStringValue(Class<?> clazz) {
         if (clazz.equals(Boolean.class)) {
             return "{\"result\" : \"success\"}";
@@ -414,34 +432,5 @@ public abstract class ApiDocGenerator {
             LOG.error(String.format("Ooops! Report this error. '%s'", e.getMessage()));
             e.printStackTrace(System.err);
         }
-    }
-
-    public static void main(String[] args) {
-        EndpointConfig config = EndpointConfig.build("rest/api-gen-config.properties");
-        ApiDocGenerator gen = new ApiDocGenerator(config, new ApiReqBuilder()) {
-
-            @Override
-            public ApiReq createApiReq() {
-                return new ApiReq();
-            }
-
-            @Override
-            public void mergeWithOtherEndpoints(Collection<ApiReq> targetEndpoints) {
-                // TODO: write implementation if need be
-            }
-
-            @Override
-            public String getEndpointDefinitions() {
-                return config.getEndpointDefinitions();
-            }
-
-            @Override
-            public Client getRestClient() {
-                ClientConfig clientConfig = new ClientConfig();
-                Client client = ClientBuilder.newClient(clientConfig);
-                return client;
-            }
-        };
-        gen.start();
     }
 }
