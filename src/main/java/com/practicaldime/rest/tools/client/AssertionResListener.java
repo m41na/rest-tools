@@ -8,8 +8,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.mvel2.MVEL;
 
-import com.practicaldime.rest.tools.model.ApiAssert;
-import com.practicaldime.rest.tools.model.ApiRes;
+import com.practicaldime.common.entity.rest.ApiAssert;
+import com.practicaldime.common.entity.rest.ApiRes;
 import com.practicaldime.rest.tools.util.RestToolsJson;
 
 public class AssertionResListener implements ApiResListener {
@@ -53,7 +53,7 @@ public class AssertionResListener implements ApiResListener {
             case assertEquals: {
                 Map<String, Object> context = RestToolsJson.fromJson(response.getResponseBody().toString(), Map.class);
                 String actual = MVEL.evalToString(assertion.getActualValue(), context);
-                String result = actual.contains((String) assertion.getExpectedValue()) ? "pass" : assertion.getFailMessage();
+                String result = actual.equals(assertion.getExpectedValue()) ? "pass" : assertion.getFailMessage();
                 assertion.setResult(result);
                 return result;
             }

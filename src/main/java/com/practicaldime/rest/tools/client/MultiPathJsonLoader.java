@@ -33,7 +33,7 @@ public class MultiPathJsonLoader implements JsonLoader {
         } else {
             LOG.info("It's a file resource, so search classpath first then fallback to file path if need be");
             try {
-                //try claspath
+                //try classpath
                 return cpLoader.loadJson();
             } catch (RuntimeException e) {
                 //try file path
@@ -50,7 +50,7 @@ public class MultiPathJsonLoader implements JsonLoader {
         } else {
             LOG.info("It's a file resource, so search classpath first then fallback to file path if need be");
             try {
-                //try claspath
+                //try classpath
                 return cpLoader.readValue(type);
             } catch (RuntimeException e) {
                 //try file path
@@ -67,7 +67,7 @@ public class MultiPathJsonLoader implements JsonLoader {
         } else {
             LOG.info("It's a file resource, so search classpath first then fallback to file path if need be");
             try {
-                //try claspath
+                //try classpath
                 return cpLoader.readValue(type);
             } catch (RuntimeException e) {
                 //try file path

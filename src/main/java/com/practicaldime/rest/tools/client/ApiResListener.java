@@ -2,8 +2,8 @@ package com.practicaldime.rest.tools.client;
 
 import java.util.List;
 
-import com.practicaldime.rest.tools.model.ApiAssert;
-import com.practicaldime.rest.tools.model.ApiRes;
+import com.practicaldime.common.entity.rest.ApiAssert;
+import com.practicaldime.common.entity.rest.ApiRes;
 
 public interface ApiResListener {
 

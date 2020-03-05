@@ -3,7 +3,7 @@ package com.practicaldime.rest.tools.api.search;
 import java.util.Iterator;
 import java.util.List;
 
-import com.practicaldime.rest.tools.model.ApiReq;
+import com.practicaldime.common.entity.rest.ApiReq;
 
 public class TokenPathSearch implements SearchStrategy {
 

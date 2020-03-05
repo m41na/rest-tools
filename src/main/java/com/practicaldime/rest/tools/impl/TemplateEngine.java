@@ -20,7 +20,7 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateExceptionHandler;
 import com.practicaldime.rest.tools.api.ApiReqComparator;
-import com.practicaldime.rest.tools.model.ApiReq;
+import com.practicaldime.common.entity.rest.ApiReq;
 import com.practicaldime.rest.tools.util.RestToolsJson;
 
 public class TemplateEngine {

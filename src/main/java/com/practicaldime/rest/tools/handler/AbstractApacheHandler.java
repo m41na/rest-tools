@@ -63,8 +63,8 @@ import com.practicaldime.rest.tools.api.RequestHandler;
 import com.practicaldime.rest.tools.client.FileDataReader;
 import com.practicaldime.rest.tools.client.FileDataReader.ByteArrayCallback;
 import com.practicaldime.rest.tools.client.FileDataReader.StringCallback;
-import com.practicaldime.rest.tools.model.ApiReq;
-import com.practicaldime.rest.tools.model.ApiRes;
+import com.practicaldime.common.entity.rest.ApiReq;
+import com.practicaldime.common.entity.rest.ApiRes;
 
 public abstract class AbstractApacheHandler<T> implements RequestHandler<T> {
 
@@ -79,20 +79,20 @@ public abstract class AbstractApacheHandler<T> implements RequestHandler<T> {
             headers.keySet().forEach((key) -> {
                 String value = headers.get(key);
                 //should multiple values in one header have individual BasicHeader objects created?
-                headersList.add(new BasicHeader(key, value));
+                headersList.add(new BasicHeader(key.toUpperCase(), value));
             });
         }
 
         // extract content-type
         String consumes = rep.getConsumes();
         if (isNotEmpty(consumes) && (hasValidMediaType(consumes))) {
-            headersList.add(new BasicHeader("Content-Type", consumes));
+            headersList.add(new BasicHeader("content-type", consumes));
         }
 
         // extract accept
         String produces = rep.getProduces();
         if (isNotEmpty(produces) && hasValidMediaType(produces)) {
-            headersList.add(new BasicHeader("Accept", produces));
+            headersList.add(new BasicHeader("accept", produces));
         }
         return headersList.toArray(new Header[headersList.size()]);
     }
@@ -125,24 +125,24 @@ public abstract class AbstractApacheHandler<T> implements RequestHandler<T> {
         if (req.getEntity() != null) {
             String contentType = req.getEntity().getContentType().getValue();
             if (contentType.contains("boundary=")) {
-                req.setHeader("Content-Type", contentType);
+                req.setHeader("content-type", contentType);
             }
         }
     }
 
-    protected HttpEntity extractEntity(ApiReq rep) throws UnsupportedEncodingException {
-        if (rep.getConsumes().contains("application/json")) {
-            String entity = stripStartEndCommas(rep.getEntity().replace("'", "\""));
+    protected HttpEntity extractEntity(ApiReq req) throws UnsupportedEncodingException {
+        if (req.getConsumes().contains("application/json") || req.hasHeaderValue("content-type", "application/json")) {
+            String entity = stripStartEndCommas(req.getEntity().replace("'", "\""));
             return new StringEntity(entity, ContentType.APPLICATION_JSON);
         }
-        if (rep.getConsumes().contains("multipart/form-data")) {
+        if (req.getConsumes().contains("multipart/form-data") || req.hasHeaderValue("content-type", "multipart/form-data")) {
             // start creating multipart entity
             MultipartEntityBuilder builder = MultipartEntityBuilder.create();
             builder.setContentType(ContentType.MULTIPART_FORM_DATA);
             builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
 
             // break up entity string and add to builder
-            String formParamsString = stripStartEndCommas(rep.getEntity());
+            String formParamsString = stripStartEndCommas(req.getEntity());
             List<NameValuePair> formParams = extractFormParameters(formParamsString);
             formParams.forEach((param) -> {
                 if (param.getName().equals("file")) {
@@ -158,8 +158,8 @@ public abstract class AbstractApacheHandler<T> implements RequestHandler<T> {
             HttpEntity entity = builder.build();
             return entity;
         }
-        if (rep.getConsumes().contains("multipart/form-data --> this is an alternative approach")) {
-            String fileName = stripStartEndCommas(rep.getEntity());
+        if (req.getConsumes().contains("multipart/form-data --> this is an alternative approach")) {
+            String fileName = stripStartEndCommas(req.getEntity());
             File file = new File(fileName);
 
             MultipartEntityBuilder builder = MultipartEntityBuilder.create();
@@ -168,9 +168,9 @@ public abstract class AbstractApacheHandler<T> implements RequestHandler<T> {
             builder.addTextBody("text", "awesome!", ContentType.DEFAULT_BINARY);
             return builder.build();
         }
-        if (rep.getConsumes().contains("application/x-www-form-urlencoded")) {
+        if (req.getConsumes().contains("application/x-www-form-urlencoded") || req.hasHeaderValue("content-type", "application/x-www-form-urlencoded")) {
             List<NameValuePair> nvps = new ArrayList<>();
-            String entity = stripStartEndCommas(rep.getEntity());
+            String entity = stripStartEndCommas(req.getEntity());
             String[] pairs = entity.split("&");
             for (String pair : pairs) {
                 String[] keyValue = pair.split("=");
@@ -275,7 +275,7 @@ public abstract class AbstractApacheHandler<T> implements RequestHandler<T> {
 
     protected void buildApiRes(ApiRes res, HttpResponse response) throws IOException {
         res.setStatusCode(response.getStatusLine().getStatusCode());
-        res.setStatusDescr(response.getStatusLine().getReasonPhrase());
+        res.setDescription(response.getStatusLine().getReasonPhrase());
         res.setProtocol(response.getStatusLine().getProtocolVersion().getProtocol());
         for (Header header : response.getAllHeaders()) {
             res.getHeaders().put(header.getName(), header.getValue());

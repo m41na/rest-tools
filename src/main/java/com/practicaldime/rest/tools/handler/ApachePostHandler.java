@@ -6,8 +6,8 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 
-import com.practicaldime.rest.tools.model.ApiReq;
-import com.practicaldime.rest.tools.model.ApiRes;
+import com.practicaldime.common.entity.rest.ApiReq;
+import com.practicaldime.common.entity.rest.ApiRes;
 
 public class ApachePostHandler extends AbstractApacheHandler<ApiRes> {
 
