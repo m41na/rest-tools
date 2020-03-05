@@ -1,10 +1,10 @@
 package com.practicaldime.rest.tools.api.search;
 
+import com.practicaldime.common.entity.rest.ApiReq;
+import com.practicaldime.rest.tools.api.ApiReqComparator;
+
 import java.util.Collections;
 import java.util.List;
-
-import com.practicaldime.rest.tools.api.ApiReqComparator;
-import com.practicaldime.rest.tools.api.ApiReq;
 
 public class PlainPathSearch implements SearchStrategy {
 

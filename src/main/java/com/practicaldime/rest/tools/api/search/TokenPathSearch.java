@@ -1,9 +1,9 @@
 package com.practicaldime.rest.tools.api.search;
 
+import com.practicaldime.common.entity.rest.ApiReq;
+
 import java.util.Iterator;
 import java.util.List;
-
-import com.practicaldime.rest.tools.api.ApiReq;
 
 public class TokenPathSearch implements SearchStrategy {
 
@@ -18,7 +18,7 @@ public class TokenPathSearch implements SearchStrategy {
     public ApiReq searchEndpoint(List<ApiReq> list, String path, String method) {
         String[] tokens = path.split("/"); // example /user/2/todo/1 -> [user, 2, todo, 1]
         ApiReq matchedEndpoint = null;
-        for (Iterator<ApiReq> iter = list.iterator(); iter.hasNext();) {
+        for (Iterator<ApiReq> iter = list.iterator(); iter.hasNext(); ) {
             ApiReq info = iter.next();
             String[] infoTokens = info.getPath().split("/"); //example /user/:userId/todo/:todoId -> [user, :userId, todo, :todoId]
             if (infoTokens.length != tokens.length) {

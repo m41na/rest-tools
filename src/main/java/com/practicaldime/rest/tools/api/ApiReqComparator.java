@@ -1,13 +1,12 @@
 package com.practicaldime.rest.tools.api;
 
-import java.util.Comparator;
+import com.practicaldime.common.entity.rest.ApiReq;
 
-import com.practicaldime.rest.tools.api.ApiReq;
+import java.util.Comparator;
 
 /**
  * Search for item. Best match is when paths match, otherwise use path and
  * method combo.
- *
  */
 public class ApiReqComparator implements Comparator<ApiReq> {
 

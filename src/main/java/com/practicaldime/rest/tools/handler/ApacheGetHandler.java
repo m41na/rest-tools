@@ -1,13 +1,12 @@
 package com.practicaldime.rest.tools.handler;
 
-import java.io.IOException;
-
+import com.practicaldime.common.entity.rest.ApiReq;
+import com.practicaldime.common.entity.rest.ApiRes;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 
-import com.practicaldime.rest.tools.api.ApiReq;
-import com.practicaldime.rest.tools.api.ApiRes;
+import java.io.IOException;
 
 public class ApacheGetHandler extends AbstractApacheHandler<ApiRes> {
 
@@ -28,6 +27,8 @@ public class ApacheGetHandler extends AbstractApacheHandler<ApiRes> {
             return res;
         } catch (IOException th) {
             String error = retrieveStackTrace(th);
+            endpoint.getResponse().setStatusCode(503);
+            endpoint.getResponse().setDescription("Service Unavailable");
             endpoint.getResponse().setResponseBody(error);
             return endpoint.getResponse();
         }

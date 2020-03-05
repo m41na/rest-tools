@@ -9,8 +9,10 @@
         "produces": "application/json",
         "headers": {},
         "entity": "",
-        "response": "please provide a response",
-        "status": 200,
+        "response": {
+            "statusCode": 200,
+            "responseBody": "put you response here"
+        },
         "url": "http://localhost:9080/rest/app",
         "envs": {
             "local":"http://localhost:9083/rest/app",

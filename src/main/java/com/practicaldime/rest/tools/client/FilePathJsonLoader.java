@@ -23,7 +23,7 @@ public class FilePathJsonLoader implements JsonLoader {
 
     @Override
     public JsonNode loadJson() {
-        File file = new File(".", sourceFile);
+        File file = new File(sourceFile);
         if (file.exists() && file.isFile()) {
             try (InputStream is = new FileInputStream(file)) {
                 LOG.info("creating sample endpoints data");
@@ -40,7 +40,7 @@ public class FilePathJsonLoader implements JsonLoader {
 
     @Override
     public <T> T readValue(Class<T> type) {
-        File file = new File(".", sourceFile);
+        File file = new File(sourceFile);
         if (file.exists() && file.isFile()) {
             try (InputStream is = new FileInputStream(file)) {
                 LOG.info("creating sample endpoints data");
@@ -58,7 +58,7 @@ public class FilePathJsonLoader implements JsonLoader {
 
     @Override
     public <T> T readValue(TypeReference<T> type) {
-        File file = new File(".", sourceFile);
+        File file = new File(sourceFile);
         if (file.exists() && file.isFile()) {
             try (InputStream is = new FileInputStream(file)) {
                 LOG.info("creating sample endpoints data");

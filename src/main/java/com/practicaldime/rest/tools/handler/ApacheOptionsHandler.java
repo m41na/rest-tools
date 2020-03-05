@@ -5,9 +5,8 @@ import java.io.IOException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpOptions;
 import org.apache.http.impl.client.CloseableHttpClient;
-
-import com.practicaldime.rest.tools.api.ApiReq;
-import com.practicaldime.rest.tools.api.ApiRes;
+import com.practicaldime.common.entity.rest.ApiReq;
+import com.practicaldime.common.entity.rest.ApiRes;
 
 public class ApacheOptionsHandler extends AbstractApacheHandler<ApiRes> {
 

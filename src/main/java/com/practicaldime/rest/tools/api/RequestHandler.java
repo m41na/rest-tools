@@ -1,6 +1,6 @@
 package com.practicaldime.rest.tools.api;
 
-import com.practicaldime.rest.tools.api.ApiReq;
+import com.practicaldime.common.entity.rest.ApiReq;
 
 public interface RequestHandler<T> {
 

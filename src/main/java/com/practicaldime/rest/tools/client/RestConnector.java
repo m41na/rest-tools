@@ -1,10 +1,9 @@
 package com.practicaldime.rest.tools.client;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
+import com.practicaldime.rest.tools.util.RestToolsJson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,9 +18,9 @@ import com.practicaldime.rest.tools.handler.ApacheHeadHandler;
 import com.practicaldime.rest.tools.handler.ApacheOptionsHandler;
 import com.practicaldime.rest.tools.handler.ApachePostHandler;
 import com.practicaldime.rest.tools.handler.ApachePutHandler;
-import com.practicaldime.rest.tools.api.ApiAssert;
-import com.practicaldime.rest.tools.api.ApiReq;
-import com.practicaldime.rest.tools.api.ApiRes;
+import com.practicaldime.common.entity.rest.ApiAssert;
+import com.practicaldime.common.entity.rest.ApiReq;
+import com.practicaldime.common.entity.rest.ApiRes;
 
 public class RestConnector implements Runnable, RestConstants {
 
@@ -178,27 +177,27 @@ public class RestConnector implements Runnable, RestConstants {
                 if (method.equalsIgnoreCase(GET)) {
                     ApiRes response = new ApacheGetHandler().handle(endpoint);
                     notifyResponse(response, endpoint.getAssertions());
-                    System.out.println(endpoint);
+                    System.out.println(RestToolsJson.toJson(endpoint));
                 } else if (method.equalsIgnoreCase(POST)) {
                     ApiRes response = new ApachePostHandler().handle(endpoint);
                     notifyResponse(response, endpoint.getAssertions());
-                    System.out.println(endpoint);
+                    System.out.println(RestToolsJson.toJson(endpoint));
                 } else if (method.equalsIgnoreCase(PUT)) {
                     ApiRes response = new ApachePutHandler().handle(endpoint);
                     notifyResponse(response, endpoint.getAssertions());
-                    System.out.println(endpoint);
+                    System.out.println(RestToolsJson.toJson(endpoint));
                 } else if (method.equalsIgnoreCase(DELETE)) {
                     ApiRes response = new ApacheDeleteHandler().handle(endpoint);
                     notifyResponse(response, endpoint.getAssertions());
-                    System.out.println(endpoint);
+                    System.out.println(RestToolsJson.toJson(endpoint));
                 } else if (method.equalsIgnoreCase(HEAD)) {
                     ApiRes response = new ApacheHeadHandler().handle(endpoint);
                     notifyResponse(response, endpoint.getAssertions());
-                    System.out.println(endpoint);
+                    System.out.println(RestToolsJson.toJson(endpoint));
                 } else if (method.equalsIgnoreCase(OPTIONS)) {
                     ApiRes response = new ApacheOptionsHandler().handle(endpoint);
                     notifyResponse(response, endpoint.getAssertions());
-                    System.out.println(endpoint);
+                    System.out.println(RestToolsJson.toJson(endpoint));
                 } else {
                     String message = String.format("Handler for '%s' method has not yet been implemented", method);
                     throw new UnsupportedOperationException(message);
@@ -220,8 +219,20 @@ public class RestConnector implements Runnable, RestConstants {
     }
 
     public static void main(String... args) {
-        String ENDPOINTS_FILE = "/rest/target-endpoints.json";
-        RestConnector client = new RestConnector(new ClassPathJsonLoader(ENDPOINTS_FILE));
+        Map<String, String> config = new HashMap<>(){{
+            put("endpoints", "classpath:rest/endpoints.json"); //loader prefixes are either (classpath, file, string or multi)
+        }};
+        if(args.length > 0) {
+            config.put("endpoints", args[0]);
+        }
+        if(System.getProperty("endpoints") != null){
+            config.put("endpoints", System.getProperty("endpoints"));
+        }
+
+        String ENDPOINTS_FILE = config.get("endpoints");
+
+        JsonLoaderFactory factory = new JsonLoaderFactory();
+        RestConnector client = new RestConnector(factory.apply(ENDPOINTS_FILE));
         client.run();
     }
 }

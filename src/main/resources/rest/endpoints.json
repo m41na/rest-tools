@@ -1,0 +1,40 @@
+[
+  {
+    "id": 0,
+    "name": "template",
+    "descr": "provide your own template",
+    "method": "GET",
+    "path": "/",
+    "consumes": "",
+    "produces": "application/json",
+    "headers": {},
+    "entity": "",
+    "response": {
+      "statusCode": 200,
+      "responseBody": "put you response here"
+    },
+    "url": "http://localhost:8001",
+    "envs": {
+      "local":"http://localhost:9083/rest/app",
+      "dev":"http://some-dev-host:port/rest/app",
+      "test":"http://some-test-host:port/rest/app"
+    },
+    "execute": false
+  },
+  {
+    "id": 1,
+    "name": "fetch available games",
+    "path": "/provider",
+    "headers": {"user-id": "admin", "access-token":"1346233178"},
+    "execute": false
+  },
+  {
+    "id": 3,
+    "method": "post",
+    "name": "build new askable",
+    "path": "/question",
+    "headers": {"accept": "application/json", "content-type":"application/json"},
+    "entity": "{\n\t\"question\": \"what is 20+10\",\n\t\"category\": \"ARITHMETIC\",\n\t\"points\": 1000,\n\t\"answer\": {\n\t\t\"correct\": {\n\t\t\t\"value\": \"30\",\n\t\t\t\"reason\": \"simple addition\",\n\t\t\t\"description\": \"\"\n\t\t},\n\t\t\"cluesFor\": [\"10\",\"15\",\"20\",\"30\"],\n\t\t\"cluesAgainst\": [],\n\t\t\"pairedClues\": [\n\t\t\t{\n\t\t\t\t\"value\": \"10\",\n\t\t\t\t\"matcher\": \"10\",\n\t\t\t\t\"correct\": true\n\t\t\t}\n\t\t]\n\t},\n\t\"dateCreated\": \"Jan 20, 2019 03:02:06\"\n}",
+    "execute": true
+  }
+]
